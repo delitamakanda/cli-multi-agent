@@ -1,6 +1,6 @@
 import time
 from mistralai.client import Mistral
-from repo_audit.providers.base import LLMProvider
+from orchestrator.providers.base import LLMProvider
 
 class MistralProvider(LLMProvider):
     def __init__(

@@ -1,10 +1,9 @@
-from email.mime import application
 from pathlib import Path
 
 import typer
 
-from repo_audit.application.auditService import AuditService
-from repo_audit.bootstrap import build_application
+from orchestrator.application.audit_service import AuditService
+from orchestrator.bootstrap import build_application
 
 app = typer.Typer(
     help="A command line tool to audit a git repository for security vulnerabilities and license compliance issues.",
@@ -24,7 +23,7 @@ def analyze(
         "--output",
         "-o",
     ),
-    config: Path = typer.Option(
+    config: Path | None = typer.Option(
         None,
         "--config",
         "-c",

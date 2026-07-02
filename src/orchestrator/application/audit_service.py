@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from repo_audit.domain.models import AuditResult
+from orchestrator.domain.models import AuditResult
 
 class AuditService:
     def __init__(
