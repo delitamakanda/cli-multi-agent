@@ -13,3 +13,8 @@ init uv
 uv init --package
 uv venv
 ```
+
+launch orchestrator
+```bash
+uv run python -m orchestrator
+```

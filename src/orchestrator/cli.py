@@ -55,7 +55,3 @@ def analyze(
 
     for path in paths:
         typer.echo(f"Report written to: {path}")
-
-
-if __name__ == "__main__":
-    app()

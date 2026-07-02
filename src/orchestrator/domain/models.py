@@ -4,6 +4,13 @@ from pathlib import Path
 from orchestrator.discovery.stack_detector import DetectedStack
 
 @dataclass(slots=True)
+class AuditResult:
+    stack: DetectedStack
+    repository_context: "RepositoryContext"
+    final_report: str
+    roadmap: str | None = None
+
+@dataclass(slots=True)
 class SourceFile:
     path: Path
     language: str | None
