@@ -75,10 +75,10 @@ class OrchestratorAgent:
         return "\n".join([
             f"- Nom du dépôt : {repository_context.name}",
             f"- Chemin du dépôt : {repository_context.repository_path}",
-            f"- Stack : {stack.name}",
+            f"- Stack : {stack.display_name()}",
             f"- Langages : {languages}",
             f"- Frameworks : {frameworks}",
             f"- Outils : {tools}",
             f"- Nombre de fichiers analysés : {len(repository_context.files)}",
-            f"- Monorepo : {'Oui' if repository_context.is_monorepo else 'Non'}",
+            f"- Monorepo : {'Oui' if stack.is_monorepo else 'Non'}",
         ])

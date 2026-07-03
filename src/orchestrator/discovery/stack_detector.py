@@ -11,6 +11,14 @@ class DetectedStack:
     tools: set[str] = field(default_factory=set)
     is_monorepo: bool = False
 
+    def display_name(self) -> str:
+        parts: list[str] = []
+        if self.frameworks:
+            parts.extend(sorted(self.frameworks))
+        elif self.languages:
+            parts.extend(sorted(self.languages))
+        return ", ".join(parts) if parts else "Inconnu"
+
 
 class StackDetector:
     def detect(self, repository: Path) -> DetectedStack:
