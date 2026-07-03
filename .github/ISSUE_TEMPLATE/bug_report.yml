@@ -1,0 +1,76 @@
+name: bug
+description: Report a bug in the project
+title: "[BUG]"
+labels: bug
+types:
+  - bug
+
+body:
+  - type: markdown
+    attributes:
+    value: |
+      Merci de remplir ce formulaire pour signaler un bug. Veuillez fournir autant d’informations que possible pour nous aider à le reproduire et le résoudre.
+
+  - type: input
+    id: version
+    attributes:
+    label: Version du CLI
+    placeholder: "0.1.0 ou abc123"
+    validations:
+    required: true
+
+  - type: dropdown
+    id: repository_source
+    attributes:
+    label: Source du dépôt analysé
+    options:
+    - Dépôt local
+    - GitHub public
+    - GitHub privé
+    validations:
+    required: true
+
+  - type: input
+    id: command
+    attributes:
+    label: Commande exécutée
+    placeholder: "repo-audit analyze https://github.com/owner/repository"
+    validations:
+    required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+    label: Étapes pour reproduire le bug
+    description: Décrivez les étapes exactes pour reproduire le bug.
+    validations:
+    required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+    label: Comportement attendu
+    placeholder: "Le CLI devrait afficher un rapport d’audit complet."
+    validations:
+    required: true
+
+  - type: input
+    id: operating_system
+    attributes:
+    label: Système d’exploitation
+    placeholder: "Windows 11, Ubuntu 24.04, macOS..."
+    validations:
+    required: true
+
+  - type: input
+    id: python_version
+    attributes:
+    label: Version de Python
+    placeholder: "Python 3.14"
+
+  - type: textarea
+    id: additional_context
+    attributes:
+    label: Contexte supplémentaire
+    description: Logs, captures ou informations utiles.
+    

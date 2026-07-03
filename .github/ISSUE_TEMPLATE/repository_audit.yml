@@ -1,0 +1,79 @@
+name: Repository Audit
+description: Request a comprehensive audit of the repository
+title: "[AUDIT] "
+labels: ["audit", "review"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for requesting a repository audit. Please provide details about the audit scope and focus areas.
+
+  - type: textarea
+    id: audit_scope
+    attributes:
+      label: Audit Scope
+      description: What areas of the repository should be audited?
+      placeholder: |
+        - Code quality
+        - Security vulnerabilities
+        - Performance issues
+        - Documentation completeness
+    validations:
+      required: true
+
+  - type: textarea
+    id: audit_focus
+    attributes:
+      label: Focus Areas
+      description: Are there specific components or files you'd like the auditor to focus on?
+      placeholder: |
+        - Specific modules or services
+        - Particular functionality
+        - Known problem areas
+    validations:
+      required: false
+
+  - type: textarea
+    id: background
+    attributes:
+      label: Background Context
+      description: Provide any relevant background information about recent changes or concerns
+      validations:
+        required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How urgent is this audit?
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: audit_types
+    attributes:
+      label: Audit Types
+      description: Select which types of audit are needed
+      options:
+        - label: Code Review
+        - label: Security Audit
+        - label: Performance Review
+        - label: Documentation Audit
+        - label: Test Coverage Analysis
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: Additional Information
+      description: Any other relevant details or questions
+      validations:
+        required: false
