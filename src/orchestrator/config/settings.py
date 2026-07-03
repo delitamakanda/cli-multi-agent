@@ -27,6 +27,7 @@ class ScannerSettings(BaseModel):
         '.env',
         'config.yaml',
         'dist',
+        '.venv',
         'build',
     ])
 
