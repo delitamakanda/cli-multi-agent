@@ -37,7 +37,7 @@ class AgentRegistry:
         return agents
     
     def _supports_stack(self, config: Any, repository_context: RepositoryContext) -> bool:
-        supported_frameworks = set(config.supported_frameworks)
+        supported_frameworks = set(config.frameworks)
         if not supported_frameworks:
             return True  # If no specific frameworks are defined, assume support for all
         

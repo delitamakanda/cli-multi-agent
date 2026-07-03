@@ -9,14 +9,13 @@ class SpecialistAgentSettings:
     enabled: bool = True
     description: str = ""
     frameworks: list[str] = field(default_factory=list)
-    supported_frameworks: list[str] = field(default_factory=list)
 
 @dataclass(slots=True)
 class AuditResult:
     stack: DetectedStack
     repository_context: "RepositoryContext"
-    manifest: dict[str, str] = field(default_factory=dict)
     final_report: str
+    manifest: dict[str, str] = field(default_factory=dict)
     roadmap: str | None = None
 
 @dataclass(slots=True)

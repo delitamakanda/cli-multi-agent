@@ -67,12 +67,12 @@ class ContextBuilder:
     
     @staticmethod
     def _build_manifest_section(repository_context: RepositoryContext) -> str:
-        if not repository_context.manifest:
+        if not repository_context.manifests:
             return ""
         
         sections = ["# Manifest\n"]
 
-        for path, content in repository_context.manifest.items():
+        for path, content in repository_context.manifests.items():
             sections.append(f"## {path}\n\n```\n{content}\n```\n")
 
         return "\n".join(sections)
