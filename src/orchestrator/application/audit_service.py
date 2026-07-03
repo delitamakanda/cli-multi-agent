@@ -29,7 +29,7 @@ class AuditService:
     def analyze(self, repository_path: Path, generate_roadmap: bool = True) -> AuditResult:
         stack = self.stack_detector.detect(repository_path)
 
-        repository_context = self.scanner.scan_repository(repository_path, stack)
+        repository_context = self.scanner.scan(repository_path, stack)
 
         plugins = self.plugin_registry.resolve(repository_context)
 

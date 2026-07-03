@@ -123,7 +123,7 @@ class RepositoryScanner:
             name=repository_path.name,
             stack=stack,
             files=files,
-            manifest_files=manifest_files,
+            manifests=manifest_files,
             git_summary=""
         )
     
