@@ -1,9 +1,9 @@
-# Report d'audit - orchestrator
+# Report d'audit - orion-platform
 
 
 ## Résumé du dépôt
 
-- **Chemin du dépôt**: C:\DEV\PROTO\orchestrator
+- **Chemin du dépôt**: C:\Users\delit\AppData\Local\Temp\repo-audit-u_89bcx8\orion-platform
 - **Langages détectés**: JavaScript, Python
 - **Frameworks détectés**: None
 - **Outils détectés**: Ansible
@@ -11,155 +11,234 @@
 
 ## Rapport final
 
-# **Rapport Final d'Analyse du Dépôt `orchestrator`**
-*Généré le 03/07/2026*
-*Agent Chef d'Orchestre - Mistral AI*
+# **Rapport Final d'Audit Technique - Orion Platform**
+*Date : 03 juillet 2026*
+*Analyse complète par Agent Chef d'Orchestre (Mistral AI)*
 
 ---
 
 ---
 
-## **📌 Résumé Exécutif**
-Le dépôt **`orchestrator`** est un projet **CLI multi-agent** en **Python** (version requise **≥3.14**, non valide en juillet 2026) et **JavaScript**, conçu pour auditer des dépôts Git.
-**2 794 fichiers** ont été analysés, mais **la structure du code source (`orchestrator/`) et les tests (`tests/`) ne sont pas visibles** dans le contexte fourni.
+## **📌 1. Résumé Exécutif**
+Le dépôt **Orion Platform** est une application web destinée aux administrations, magistrats et procureurs pour la **priorisation et l'analyse des plaintes**. Il est structuré en **3 services indépendants** :
+- **`mock-system-api`** : Mock API externe (JSON Server) pour simuler un système de gestion des plaintes.
+- **`orion-api`** : Backend Django (v6.0.6) avec Django REST Framework pour la synchronisation des plaintes et la priorisation IA (via Mistral API ou mock).
+- **`orion-web`** : Frontend Angular 22 avec Angular Material et Tailwind CSS pour l'interface utilisateur.
 
 ### **Points Clés**
-✅ **Points forts** :
-- Utilisation d'outils modernes : `pyproject.toml` (PEP 621), `typer` (CLI), `pydantic` (validation), `rich` (affichage), `mypy` (typage strict), `ruff` (linting), `pytest` (tests).
-- Intégration de bonnes pratiques : typage statique strict, linter configuré, couverture de code mesurée.
-- Architecture modulaire (référence à `orchestrator.cli:app`).
+✅ **Architecture bien segmentée** avec une séparation claire des responsabilités.
+✅ **Dockerisé** (via `compose.yaml`) pour un déploiement local simplifié.
+✅ **Intégration CI/CD** via GitHub Actions pour Angular et Django.
+✅ **Stack technique moderne** : Django 6.0.6, Angular 22, Tailwind CSS v4.
 
-❌ **Problèmes majeurs** :
-- **Version Python invalide** (`>=3.14`) → bloque l'installation.
-- **Dépendance non résolue** (`mistralai`) → risque d'échec de `pip install`.
-- **Absence de documentation** (`README.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md`) → difficulté pour les utilisateurs et contributeurs.
-- **Pas de CI/CD** → pas de validation automatique des tests/linting.
-- **Accessibilité limitée** : dépendance aux couleurs (`rich`), pas de mode `--no-color` ou `--accessible`.
-- **Sécurité** : pas de scan de vulnérabilités (`safety`, `pip-audit`), pas de gestion des secrets (`detect-secrets`), pas de `.gitignore` strict.
+⚠️ **Risques majeurs identifiés** :
+- **Sécurité** : Secrets exposés (`SECRET_KEY`, `MISTRAL_API_KEY`), `DEBUG=True` par défaut, SQLite en production, données sensibles dans `db.json`.
+- **Qualité** : Absence de tests pour `mock-system-api`, pas de tests E2E, dépendances non verrouillées.
+- **Accessibilité** : Non-conformité WCAG (contraste, navigation clavier, sémantique HTML).
+- **Performance** : Pas de lazy loading, bundle Angular potentiellement trop lourd, pas de cache pour les requêtes API.
+- **DevOps** : Pas de workflow CI/CD global, pas de health checks Docker, pas de monitoring.
 
-⚠️ **Risques mineurs** :
-- **Hétérogénéité des langages** (Python + JavaScript) → à documenter ou unifier.
-- **Ansible mentionné mais non utilisé** → clarifier son rôle.
-- **Structure de fichiers non standard** (ex: `pytest` dans `.venv`).
-
----
+🎯 **Priorité absolue** :
+1. **Corriger les failles de sécurité critiques** (secrets, DEBUG, SQLite, HTTPS).
+2. **Ajouter des tests** (unitaire, E2E, intégration).
+3. **Améliorer l'accessibilité** (WCAG AA).
+4. **Optimiser les performances** (lazy loading, cache, bundle size).
 
 ---
 
 ---
 
-## **❌ Problèmes Critiques**
-*À résoudre en priorité absolue (blocages fonctionnels ou de sécurité)*
+---
+
+## **🚨 2. Problèmes Critiques**
+*À corriger **immédiatement** (risque de blocage ou de faille de sécurité majeure).*
 
 | **ID** | **Problème** | **Impact** | **Fichiers Concernés** | **Solution Proposée** |
 |--------|--------------|------------|------------------------|------------------------|
-| **CRIT-1** | **Version Python invalide (`requires-python = ">=3.14"`)** | Bloque l'installation sur tous les environnements (Python 3.14 n'existe pas en juillet 2026). | `pyproject.toml` | Remplacer par `>=3.11,<3.13` (ou `>=3.10` pour plus de compatibilité). |
-| **CRIT-2** | **Dépendance `mistralai` non résolvable** | Échec de `pip install` → projet non utilisable. | `pyproject.toml` | Vérifier le nom exact du package (ex: `mistralai-client`). Si c'est un package interne, le documenter et fournir un moyen de l'installer. |
-| **CRIT-3** | **Absence de `.gitignore`** | Risque de fuites de secrets (`.env`, `__pycache__/`, `.venv/`). | (À créer) | Ajouter un `.gitignore` strict (ex: via [gitignore.io](https://www.toptal.com/developers/gitignore)). |
-| **CRIT-4** | **Pas de gestion des secrets** | Risque de fuites de clés API (ex: pour `mistralai`). | (À créer) | Utiliser `python-dotenv` + `.env.example` et configurer `detect-secrets` en pre-commit. |
+| **SEC-001** | **`SECRET_KEY` et `MISTRAL_API_KEY` non validés** → Risque de crash ou d'exposition de clés par défaut. | **Critique** (Fuite de données, indisponibilité) | `orion-api/config/settings.py` | Ajouter une validation au démarrage : `if not SECRET_KEY: raise ValueError("SECRET_KEY manquant")`. |
+| **SEC-002** | **`DEBUG=True` par défaut** dans `compose.yaml` → Exposition d'erreurs détaillées en production. | **Critique** (Fuite d'informations sensibles) | `compose.yaml`, `orion-api/config/settings.py` | Forcer `DEBUG=False` en production : `DEBUG = os.getenv("ENVIRONMENT") != "production"`. |
+| **SEC-003** | **SQLite en production** → Non scalable, pas de backup automatique, risque de corruption. | **Critique** (Perte de données, lenteur) | `orion-api/config/settings.py` | Remplacer par PostgreSQL : `ENGINE = 'django.db.backends.postgresql'`. |
+| **SEC-004** | **Données sensibles dans `db.json`** (violences, suicides) → Risque RGPD si exposé. | **Critique** (Violation de la confidentialité) | `mock-system-api/db.json` | Remplacer par des données fictives (ex: avec `faker`). Ajouter `db.json` à `.gitignore`. |
+| **SEC-005** | **Pas de HTTPS imposé** → Risque MITM (Man-in-the-Middle). | **Critique** (Interception des données) | `orion-api/config/settings.py`, `compose.yaml` | Configurer un reverse proxy (Nginx/Traefik) avec Let's Encrypt. |
+| **SEC-006** | **`json-server` version obsolète (0.17.4)** → Vulnérabilités connues (ex: CVE-2021-23337). | **Élevé** (Attaque par injection) | `mock-system-api/package.json` | Mettre à jour vers `json-server@1.0.0` ou utiliser un mock personnalisé. |
+| **SEC-007** | **Ports exposés sur `0.0.0.0` sans restriction** → Accès non autorisé possible. | **Élevé** (Accès non sécurisé) | `compose.yaml` | Restreindre à `127.0.0.1` ou utiliser un réseau Docker interne. |
+| **ACC-001** | **Non-conformité WCAG** (contraste < 4.5:1, navigation clavier inexistante, balises non sémantiques). | **Élevé** (Exclusion des utilisateurs malvoyants) | `orion-web/src/styles.css`, `orion-web/src/index.html` | Appliquer les règles WCAG AA : contraste, `tabindex`, `aria-label`, balises sémantiques (`<nav>`, `<button>`). |
+| **ACC-002** | **Langue incorrecte (`lang="en"`)** alors que le projet est en français. | **Moyen** (Mauvaise interprétation par les outils d'assistance) | `orion-web/src/index.html` | Corriger en `lang="fr"`. |
 
 ---
 
 ---
 
-## **⚠️ Problèmes Majeurs**
-*À résoudre rapidement (impact fort sur l'UX, la maintenabilité ou la sécurité)*
+## **⚠️ 3. Problèmes Majeurs**
+*À corriger **sous 1-2 sprints** (impact significatif sur la qualité, la maintenabilité ou l'UX).*
 
 | **ID** | **Problème** | **Impact** | **Fichiers Concernés** | **Solution Proposée** |
 |--------|--------------|------------|------------------------|------------------------|
-| **MAJ-1** | **Absence de documentation utilisateur** | Les utilisateurs ne savent pas comment installer, configurer ou utiliser la CLI. | `README.md` (à créer) | Créer un `README.md` avec :<br>- Description du projet.<br>- Exemples d'utilisation (`repo-audit --help`, `repo-audit /path/to/repo`).<br>- Configuration requise (Python 3.11+, dépendances).<br>- Section dédiée à l'accessibilité. |
-| **MAJ-2** | **Pas de CI/CD** | Pas de validation automatique des tests, linting ou typage. Risque de régressions. | (À créer) `.github/workflows/ci.yml` | Ajouter un workflow GitHub Actions pour :<br>- Linter (`ruff check .`).<br>- Typage (`mypy .`).<br>- Tests (`pytest --cov`).<br>- Scan de sécurité (`pip-audit`). |
-| **MAJ-3** | **Accessibilité limitée** | La CLI dépend des couleurs (`rich`) et n'a pas de mode accessible. | `orchestrator/cli.py` | - Ajouter une option `--no-color` ou `--accessible`.<br>- Utiliser des symboles textuels (`✓`, `✗`, `[OK]`, `[ERROR]`) en plus des couleurs.<br>- Tester avec des lecteurs d'écran (NVDA, VoiceOver). |
-| **MAJ-4** | **Pas de scan de vulnérabilités** | Risque d'utiliser des dépendances vulnérables (CVE). | `pyproject.toml` | Intégrer `safety` ou `pip-audit` dans la CI/CD et en pre-commit. |
-| **MAJ-5** | **Structure de package non standard** | Le script `repo-audit` référence `orchestrator.cli:app`, mais la structure du package n'est pas visible. | `pyproject.toml`, `orchestrator/` | - Vérifier que `orchestrator/` existe avec `__init__.py` et `cli.py`.<br>- Adopter une structure `src/` pour isoler le code. |
-| **MAJ-6** | **Pas de gestion centralisée des erreurs** | Les erreurs peuvent être mal gérées ou peu claires pour l'utilisateur. | `orchestrator/cli.py` | Utiliser `pydantic` pour valider les entrées et afficher des messages d'erreur explicites avec `rich`. |
-
----
-
----
----
-## **🔍 Problèmes Mineurs**
-*À améliorer pour une meilleure qualité ou UX*
-
-| **ID** | **Problème** | **Impact** | **Fichiers Concernés** | **Solution Proposée** |
-|--------|--------------|------------|------------------------|------------------------|
-| **MIN-1** | **Hétérogénéité des langages (Python + JavaScript)** | Complexité inutile si le JS n'est pas essentiel. | (À documenter) | Documenter le rôle du JS dans le `README.md` ou le supprimer si non nécessaire. |
-| **MIN-2** | **Ansible mentionné mais non utilisé** | Incohérence entre la stack déclarée et le code. | (À clarifier) | - Si Ansible est utilisé pour le déploiement, ajouter un dossier `ansible/` avec des playbooks.<br>- Sinon, le retirer de la stack. |
-| **MIN-3** | **Configuration `ruff` trop permissive** | `line-length = 100` peut être trop long pour certains terminaux. | `pyproject.toml` | Réduire à `88` ou `100` (standard PEP 8). |
-| **MIN-4** | **Pas de configuration de couverture de code** | Impossible de mesurer la qualité des tests. | `pyproject.toml` | Configurer `pytest-cov` avec un seuil minimal (ex: 80%) :<br>```toml<br>[tool.pytest.ini_options]<br>addopts = "--cov=orchestrator --cov-report=term-missing --cov-fail-under=80"<br>``` |
-| **MIN-5** | **Pas de `pre-commit`** | Risque de commits non conformes (linting, tests). | (À créer) `.pre-commit-config.yaml` | Ajouter des hooks pour :<br>- `ruff check` (linting).<br>- `mypy` (typage).<br>- `pytest` (tests rapides).<br>- `detect-secrets` (sécurité). |
-| **MIN-6** | **Pas de fichier `LICENSE`** | Probl
+| **TEST-001** | **Pas de tests pour `mock-system-api`** → Fiabilité réduite des intégrations. | **Élevé** (Régressions non détectées) | `mock-system-api/package.json` | Ajouter `supertest` + Jest : `npm install --save-dev jest supertest`. |
+| **TEST-002** | **Pas de tests E2E** → Impossible de valider les flux utilisateurs. | **Élevé** (Qualité logicielle) | `orion-web/package.json` | Intégrer Cypress ou Playwright : `npm install --save-dev cypress`. |
+| **TEST-003** | **Pas de couverture de code** → Difficile d'évaluer la qualité des tests. | **Moyen** (Maintenabilité) | `.github/workflows/` | Ajouter `pytest-cov` (Django) et `nyc` (Angular). |
+| **DEP-001** | **Dépendances non verrouillées** (ex: `^22.0.1` pour Angular) → Risque de breaking changes. | **Élevé** (Incompatibilités) | `orion-web/package.json`, `orion-api/requirements.txt` | Utiliser des versions exactes : `=22.0.1`. Ajouter `requirements.txt` pour Django. |
+| **DEP-002** | **`requirements-dev.txt` manquant** → Environnement de dev non reproductible. | **Moyen** (Maintenabilité) | `orion-api/` | Créer `requirements-dev.txt` avec `pytest`, `flake8`, etc. |
+| **PERF-001** | **Pas de lazy loading** pour les modules Angular → Temps de chargement initial long. | **Moyen** (UX dégradée) | `orion-web/src/app/app-routing.module.ts` | Configurer `loadChildren` pour les modules lourds. |
+| **PERF-002** | **Pas de cache pour les requêtes API** → Latence accrue. | **Moyen** (Performance) | `orion-api/config/settings.py` | Ajouter `@cache_page` (Django) ou Redis. |
+| **PERF-003** | **Bundle Angular potentiellement trop lourd** (dépendances comme `xlsx`, `jspdf`). | **Moyen** (Performance) | `orion-web/package.json` | Optimiser avec `ngOptimizedImage` et code splitting. |
+| **DEVOPS-001** |
 
 ## Feuille de route
 
-Voici une **feuille de route structurée en markdown** pour le dépôt `orchestrator`, découpée en tickets prioritaires avec dépendances, risques, métriques et responsabilités. Chaque élément est **concis, actionnable et directement lié** au rapport d'analyse.
+Voici une **feuille de route technique** structurée en tickets priorisés pour le dépôt **orion-platform**, basée sur le rapport d'audit. Chaque ticket inclut les dépendances, risques, métriques de succès, et parties prenantes.
 
 ---
 
 ```markdown
-# 🚀 Feuille de Route - Projet `orchestrator`
-*Dernière mise à jour : 03/07/2026*
-*Product Owner : Synthèse / Mistral AI*
+# 🚀 Feuille de Route Technique - Orion Platform
+*Date : 03 juillet 2026*
+*Product Owner : Synthèse (Mistral AI)*
 
 ---
 
-## 📌 **Contexte**
-- **Dépôt** : `orchestrator` (CLI multi-agent pour auditer des dépôts Git).
-- **Stack** : Python (≥3.11), JavaScript, Ansible (à clarifier).
-- **Outils** : `typer`, `pydantic`, `rich`, `mypy`, `ruff`, `pytest`, `Ansible`.
-- **Fichiers analysés** : 2 794.
-- **Objectif** : Résoudre les blocages critiques, améliorer la maintenabilité et la sécurité.
-
----
-
----
-
-## 🎯 **Priorités & Jalons**
-| **Jalon**               | **Date Cible** | **Description**                                                                 | **Critère de Succès**                          |
-|-------------------------|----------------|---------------------------------------------------------------------------------|-----------------------------------------------|
-| **Jalon 1 : Résolution des blocages** | 10/07/2026     | Corriger les problèmes critiques (CRIT-1 à CRIT-4).                          | Tous les tickets CRIT sont fermés.           |
-| **Jalon 2 : Mise en conformité**      | 24/07/2026     | Résoudre les problèmes majeurs (MAJ-1 à MAJ-6).                                | CI/CD opérationnelle, documentation complète.|
-| **Jalon 3 : Améliorations**           | 07/08/2026     | Implémenter les corrections mineures (MIN-1 à MIN-6).                          | 100% des tickets MIN traités.                 |
-| **Jalon 4 : Stabilisation**           | 21/08/2026     | Tests de non-régression, feedback utilisateurs, optimisations.               | 0 régression, couverture de code ≥80%.       |
+## 📅 **Jalons Principaux**
+| Jalon | Date Cible | Objectif | Statut |
+|-------|------------|----------|--------|
+| **J1 : Sécurité Critique** | 10/07/2026 | Résolution des failles SEC-001 à SEC-007 | ⏳ À démarrer |
+| **J2 : Qualité & Tests** | 24/07/2026 | Couverture tests > 80%, correction des dépendances | ⏳ Planifié |
+| **J3 : Accessibilité & Performance** | 07/08/2026 | Conformité WCAG AA, optimisations | ⏳ Planifié |
+| **J4 : DevOps & Monitoring** | 21/08/2026 | CI/CD globale, health checks, monitoring | ⏳ Planifié |
 
 ---
 
 ---
 
-## 📋 **Backlog des Tickets**
-
-### 🔴 **Critiques (Priorité 1 - Bloquants)**
-*Doivent être résolus avant toute autre fonctionnalité.*
-
-| **ID**   | **Titre**                                      | **Description**                                                                                     | **Effort** | **Dépendances** | **Risques/Obstacles**                          | **Métriques de Succès**                     | **Parties Prenantes**               | **Responsable**          |
-|----------|------------------------------------------------|-----------------------------------------------------------------------------------------------------|------------|-----------------|-----------------------------------------------|---------------------------------------------|--------------------------------------|----------------------------|
-| CRIT-1   | Corriger la version Python invalide           | Remplacer `>=3.14` par `>=3.11,<3.13` dans `pyproject.toml`.                                      | 1h         | Aucune          | Version future non supportée.                 | `pip install` fonctionne sans erreur.       | Développeurs, Utilisateurs                | PO Technique               |
-| CRIT-2   | Résoudre la dépendance `mistralai`            | Vérifier le nom exact du package (ex: `mistralai-client`) ou le documenter comme dépendance interne. | 2h         | CRIT-1          | Package privé non accessible.                 | `pip install` réussit.                       | Équipe DevOps, PO Technique               | DevOps                     |
-| CRIT-3   | Ajouter un `.gitignore` strict                | Créer un `.gitignore` via [gitignore.io](https://www.toptal.com/developers/gitignore) pour Python. | 30m        | Aucune          | Fuites de secrets (`.env`, `__pycache__`).     | Aucun fichier sensible commité.             | Équipe Sécurité                           | DevOps                     |
-| CRIT-4   | Configurer la gestion des secrets             | Intégrer `python-dotenv` + `.env.example` et `detect-secrets` en pre-commit.                       | 2h         | CRIT-3          | Secrets exposés dans le code.                 | `detect-secrets` passe sans alerte.          | Équipe Sécurité, Développeurs             | DevOps                     |
+## 🎯 **Backlog Priorisé**
 
 ---
 
-### 🟡 **Majeurs (Priorité 2 - Impact Élevé)**
-*À traiter après les critiques.*
+### 🔴 **Sprint 1 (04/07 - 10/07) : Sécurité Critique**
+**Objectif** : Corriger les failles bloquantes identifiées dans le rapport.
 
-| **ID**   | **Titre**                                      | **Description**                                                                                     | **Effort** | **Dépendances**       | **Risques/Obstacles**                          | **Métriques de Succès**                     | **Parties Prenantes**               | **Responsable**          |
-|----------|------------------------------------------------|-----------------------------------------------------------------------------------------------------|------------|------------------------|-----------------------------------------------|---------------------------------------------|--------------------------------------|----------------------------|
-| MAJ-1    | Rédiger la documentation utilisateur          | Créer un `README.md` avec installation, exemples d'utilisation (`repo-audit --help`), et accessibilité. | 4h         | CRIT-1, CRIT-2        | Manque de clarté pour les nouveaux utilisateurs. | 100% des cas d'usage documentés.            | Utilisateurs, Équipe Support               | Tech Writer               |
-| MAJ-2    | Mettre en place une CI/CD                      | Ajouter un workflow GitHub Actions pour linting (`ruff`), typage (`mypy`), tests (`pytest`), et scan de sécurité (`pip-audit`). | 3h         | CRIT-1, CRIT-2        | CI/CD mal configurée → faux positifs/negatifs. | Tous les checks passent en PR.             | Équipe DevOps                           | DevOps                     |
-| MAJ-3    | Améliorer l'accessibilité de la CLI           | Ajouter `--no-color` et symboles textuels (`✓`, `✗`) dans `orchestrator/cli.py`.                     | 2h         | MAJ-1                 | Compatibilité avec les lecteurs d'écran.      | CLI utilisable sans couleurs.                | Équipe UX, Utilisateurs                   | Développeur Frontend       |
-| MAJ-4    | Intégrer un scan de vulnérabilités            | Ajouter `safety` ou `pip-audit` dans la CI/CD et en pre-commit.                                    | 1h         | MAJ-2                 | Dépendances vulnérables non détectées.        | 0 CVE critique dans les dépendances.         | Équipe Sécurité                           | DevOps                     |
-| MAJ-5    | Standardiser la structure du package         | Vérifier `orchestrator/` (avec `__init__.py` et `cli.py`) et adopter une structure `src/`.          | 2h         | CRIT-1                | Code non importable.                           | `python -m orchestrator` fonctionne.         | Développeurs                            | PO Technique               |
-| MAJ-6    | Centraliser la gestion des erreurs           | Utiliser `pydantic` pour valider les entrées et afficher des messages clairs avec `rich`.           | 3h         | MAJ-3                 | Erreurs cryptiques pour l'utilisateur.       | 100% des erreurs ont un message explicite.   | Développeurs                            | Développeur Backend        |
+#### **Ticket 1.1 : Sécuriser les secrets et clés API (SEC-001, SEC-004)**
+- **Description** :
+  - Valider `SECRET_KEY` et `MISTRAL_API_KEY` au démarrage de Django.
+  - Remplacer les données sensibles dans `mock-system-api/db.json` par des données fictives (via `faker`).
+  - Ajouter `db.json` à `.gitignore`.
+- **Effort** : 2 jours (1 jour backend + 1 jour mock API).
+- **Priorité** : **Critique** (P0).
+- **Dépendances** : Aucune.
+- **Risques** :
+  - Perte de données si `db.json` est supprimé sans backup (mitigation : sauvegarder avant modification).
+  - Impact sur les tests si les données mockées changent (mitigation : documenter le nouveau format).
+- **Métriques de succès** :
+  - Aucune clé API ou donnée sensible commité dans le dépôt.
+  - Validation des secrets réussie en environnement de test.
+- **Parties prenantes** :
+  - **Backend** : Développeur Django (responsable).
+  - **Frontend** : Validation de l'intégration avec le mock API.
+  - **DevOps** : Vérification des variables d'environnement en CI/CD.
 
 ---
 
-### 🟢 **Mineurs (Priorité 3 - Améliorations)**
-*À traiter après les majeurs.*
+#### **Ticket 1.2 : Désactiver DEBUG et forcer HTTPS (SEC-002, SEC-005)**
+- **Description** :
+  - Configurer `DEBUG=False` en production dans `settings.py` (via `os.getenv("ENVIRONMENT")`).
+  - Ajouter un reverse proxy (Nginx) avec Let's Encrypt pour imposer HTTPS.
+  - Restreindre les ports exposés à `127.0.0.1` dans `compose.yaml`.
+- **Effort** : 3 jours (2 jours backend + 1 jour DevOps).
+- **Priorité** : **Critique** (P0).
+- **Dépendances** : Ticket 1.1 (pour éviter les fuites de logs en DEBUG).
+- **Risques** :
+  - Indisponibilité temporaire pendant la configuration HTTPS (mitigation : tester en staging).
+  - Conflits avec les services existants (mitigation : vérifier les ports utilisés).
+- **Métriques de succès** :
+  - `DEBUG=False` vérifié en production.
+  - Score SSL Labs ≥ A (via [ssllabs.com](https://www.ssllabs.com/)).
+- **Parties prenantes** :
+  - **Backend** : Développeur Django.
+  - **DevOps** : Configuration Nginx/Traefik (responsable).
+  - **Sécurité** : Validation des certificats.
 
-| **ID**   | **Titre**                                      | **Description**                                                                                     | **Effort** | **Dépendances**       | **Risques/Obstacles**                          | **Métriques de Succès**                     | **Parties Prenantes**               | **Responsable**          |
-|----------|------------------------------------------------|-----------------------------------------------------------------------------------------------------|------------|------------------------|-----------------------------------------------|---------------------------------------------|--------------------------------------|----------------------------|
-| MIN-1    | Documenter l'usage du JavaScript               | Clarifier le rôle du JS dans le projet ou le supprimer si non nécessaire.                          | 1h         | Aucune                | Incohérence dans la stack.                     | Décision documentée dans `README.md`.        | Équipe Architecture                       | PO Technique               |
-| MIN-2    | Clarifier l'usage d'Ansible                   | Ajouter un dossier `ansible/` avec des playbooks ou supprimer Ansible de la stack.                 | 2h         | Aucune                | Outils déclarés mais non utilisés.             | Ansible utilisé ou retiré.                   | Équipe DevOps                           | DevOps                     |
-| MIN-3    | Réduire la longueur de ligne dans `ruff`      | Passer de `line-length = 100` à `88` dans `pyproject.toml`.                                        | 15m        | Aucune                | Incompatibilité avec certains terminaux.       | `ruff check` passe sans erreur.              | Développeurs                            | Développeur Backend        |
-| MIN-
+---
+---
+#### **Ticket 1.3 : Remplacer SQLite par PostgreSQL (SEC-003)**
+- **Description** :
+  - Migrer la base de données de SQLite à PostgreSQL dans `settings.py`.
+  - Configurer `docker-compose` pour PostgreSQL (image officielle).
+  - Exécuter les migrations Django (`python manage.py migrate`).
+- **Effort** : 3 jours.
+- **Priorité** : **Critique** (P0).
+- **Dépendances** : Ticket 1.2 (pour éviter les fuites via SQLite en DEBUG).
+- **Risques** :
+  - Perte de données pendant la migration (mitigation : backup de `db.sqlite3`).
+  - Incompatibilités de schémas (mitigation : tester en local avant déploiement).
+- **Métriques de succès** :
+  - Base PostgreSQL opérationnelle en production.
+  - Temps de réponse des requêtes < 200ms (moyenne).
+- **Parties prenantes** :
+  - **Backend** : Développeur Django (responsable).
+  - **DevOps** : Configuration du container PostgreSQL.
+
+---
+---
+#### **Ticket 1.4 : Mettre à jour json-server (SEC-006)**
+- **Description** :
+  - Mettre à jour `json-server` de la version `0.17.4` à `1.0.0` dans `mock-system-api/package.json`.
+  - Tester les endpoints mockés pour vérifier la compatibilité.
+- **Effort** : 1 jour.
+- **Priorité** : **Élevée** (P1).
+- **Dépendances** : Ticket 1.1 (pour éviter les fuites de données).
+- **Risques** :
+  - Breaking changes dans l'API mockée (mitigation : vérifier le [changelog](https://github.com/typicode/json-server/releases)).
+- **Métriques de succès** :
+  - Version `1.0.0` confirmée dans `package.json`.
+  - Tous les endpoints mockés fonctionnels (tests manuels).
+- **Parties prenantes** :
+  - **Frontend** : Vérification de l'intégration avec Angular.
+
+---
+---
+### 🟡 **Sprint 2 (11/07 - 24/07) : Qualité & Tests**
+**Objectif** : Améliorer la couverture de tests et stabiliser les dépendances.
+
+#### **Ticket 2.1 : Ajouter des tests unitaires pour mock-system-api (TEST-001)**
+- **Description** :
+  - Configurer Jest + Supertest dans `mock-system-api`.
+  - Écrire des tests pour les endpoints CRUD (`/complaints`, `/priorities`).
+  - Intégrer les tests dans le workflow CI (GitHub Actions).
+- **Effort** : 3 jours.
+- **Priorité** : **Élevée** (P1).
+- **Dépendances** : Ticket 1.4 (pour éviter les tests sur une version obsolète).
+- **Risques** :
+  - Temps d'exécution long des tests (mitigation : utiliser `--maxWorkers=2`).
+- **Métriques de succès** :
+  - Couverture de code ≥ 80% pour `mock-system-api`.
+  - Workflow CI vert pour les tests.
+- **Parties prenantes** :
+  - **Backend** : Développeur Node.js (responsable).
+  - **DevOps** : Intégration CI.
+
+---
+---
+#### **Ticket 2.2 : Ajouter des tests E2E avec Cypress (TEST-002)**
+- **Description** :
+  - Installer Cypress dans `orion-web`.
+  - Écrire des tests pour les flux principaux :
+    - Connexion utilisateur.
+    - Priorisation d'une plainte.
+    - Affichage des statistiques.
+  - Configurer l'exécution en CI (via `cypress/gh-action`).
+- **Effort** : 5 jours.
+- **Priorité** : **Élevée** (P1).
+- **Dépendances** : Ticket 1.1 (pour éviter les fuites de données en test).
+- **Risques** :
+  - Flakiness des tests E2E (mitigation : utiliser `cypress-retry`).
+- **Métriques de succès** :
+  - 3 flux utilisateurs couverts par des tests E2E.
+  - Workflow CI vert.
+- **Parties prenantes** :
+  - **Frontend** : Développeur Angular (responsable).
+  - **QA** : Validation des scénarios de test.
+
+---
+---
+#### **Ticket 2.3 : Verrouiller les dépendances (DEP-001, DEP-002)**
+- **Description** :
+  - Remplacer les versions flottantes (`^22.0.1`) par des versions exactes (`=22.0.1`)

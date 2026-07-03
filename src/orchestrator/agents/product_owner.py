@@ -48,6 +48,8 @@ Vérifie que le fichier final est un markdown valide.
 Rapport final : 
 {final_report}
 
+Fais bien attention à finir tes phrases et à ne pas laisser de phrases incomplètes. Pas de phrases vagues. Pas de phrases génériques. Pas de phrases qui ne sont pas directement liées au dépôt analysé.    
+
 
 """
         return self.provider.run(
