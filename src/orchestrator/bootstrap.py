@@ -13,7 +13,7 @@ from orchestrator.agents.registry import AgentRegistry
 from orchestrator.agents.orchestrator import OrchestratorAgent
 from orchestrator.agents.product_owner import ProductOwnerAgent
 
-from orchestrator.plugins.base import PluginRegistry
+from orchestrator.plugins.registry import PluginRegistry
 
 from orchestrator.providers.mistral import MistralProvider
 
