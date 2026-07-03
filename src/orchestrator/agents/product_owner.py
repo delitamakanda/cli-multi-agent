@@ -16,7 +16,6 @@ class ProductOwnerAgent:
                 f" - Languages : {languages}",
                 f" - Frameworks : {frameworks}",
                 f" - Outils : {tools}",
-                f" - Description : {repository_context.description or 'Non détectée'}",
                 f" - Fichiers analysés : {len(repository_context.files)}",
                 f" - Monorepo : {'Oui' if stack.is_monorepo else 'Non'}",
             ]
