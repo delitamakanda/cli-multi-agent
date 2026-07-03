@@ -48,8 +48,8 @@ def analyze(
     )
 
     paths = audit_service.write_reports(
-        result=result,
-        output_path=output,
+        audit_result=result,
+        output_dir=output,
         formats=format_
     )
 
