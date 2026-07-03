@@ -1,5 +1,5 @@
 # Repo Audit Orchestrator
-
+[![Orchestrator CI/CD](https://github.com/delitamakanda/cli-multi-agent/actions/workflows/python-app.yml/badge.svg?branch=main&event=push)](https://github.com/delitamakanda/cli-multi-agent/actions/workflows/python-app.yml)
 A CLI multi-agent tool that audits a git repository and produces a consolidated report covering architecture, performance, code quality, documentation, security, accessibility, DevOps practices, and UI/UX — plus an optional product roadmap.
 
 It detects your tech stack, builds targeted context for each specialist agent, runs them in parallel through the [Mistral](https://mistral.ai) API, synthesizes their findings into one report, and can generate a prioritized roadmap from the results.
