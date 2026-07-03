@@ -26,50 +26,50 @@ class AuditService:
         self.report_writers = report_writers
         self.max_workers = max_workers
 
-        def analyze(self, repo_path: Path, generate_roadmap: bool = True) -> AuditResult:
-            stack = self.stack_detector.detect_stack(repo_path)
+    def analyze(self, repo_path: Path, generate_roadmap: bool = True) -> AuditResult:
+        stack = self.stack_detector.detect(repo_path)
 
-            repository_context = self.scanner.scan_repository(repo_path, stack)
+        repository_context = self.scanner.scan_repository(repo_path, stack)
 
-            plugins = self.plugin_registry.resolve(repository_context)
+        plugins = self.plugin_registry.resolve(repository_context)
 
-            agents = self.agent_registry.resolve(repository_context, plugins)
+        agents = self.agent_registry.resolve(repository_context, plugins)
 
 
-            reports = self._run_agents(agents, repository_context, plugins)
+        reports = self._run_agents(agents, repository_context, plugins)
 
-            final_report = self.orchestrator.synthesize(repository_context, reports)
+        final_report = self.orchestrator.synthesize(repository_context, reports)
 
-            roadmap = None
+        roadmap = None
 
-            if generate_roadmap:
-                roadmap = self.product_owner.generate_roadmap(final_report, repository_context)
+        if generate_roadmap:
+            roadmap = self.product_owner.generate_roadmap(final_report, repository_context)
 
-            return AuditResult(
-                stack=stack,
-                repository_context=repository_context,
-                final_report=final_report,
-                roadmap=roadmap,
-            )
-        
-        def _run_agents(self, agents, repository_context, plugins):
-            reports: dict[str, str] = {}
+        return AuditResult(
+            stack=stack,
+            repository_context=repository_context,
+            final_report=final_report,
+            roadmap=roadmap,
+        )
+    
+    def _run_agents(self, agents, repository_context, plugins):
+        reports: dict[str, str] = {}
 
-            with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-                futures = {}
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            futures = {}
 
-                for agent in agents:
-                    context = self.context_builder.build_for_agent(agent, repository_context, plugins)
+            for agent in agents:
+                context = self.context_builder.build_for_agent(agent, repository_context, plugins)
 
-                    future = executor.submit(agent.run, context)
-                    futures[future] = agent.name
+                future = executor.submit(agent.run, context)
+                futures[future] = agent.name
 
-                for future in as_completed(futures):
-                    agent_name = futures[future]
-                    try:
-                        report = future.result()
-                        reports[agent_name] = report
-                    except Exception as e:
-                        reports[agent_name] = f"Error: {str(e)}"
+            for future in as_completed(futures):
+                agent_name = futures[future]
+                try:
+                    report = future.result()
+                    reports[agent_name] = report
+                except Exception as e:
+                    reports[agent_name] = f"Error: {str(e)}"
 
-            return reports
+        return reports

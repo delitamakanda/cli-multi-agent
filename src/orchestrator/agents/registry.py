@@ -1,15 +1,45 @@
-
+from typing import Any
+from orchestrator.agents.specialist import SpecialistAgent
+from orchestrator.domain.models import RepositoryContext
 
 class AgentRegistry:
-    def __init__(self):
-        self.agents = {}
+    def __init__(
+        self,
+        provider: Any,  # Replace 'Any' with the actual type of your provider if known
+        settings: Any,  # Replace 'Any' with the actual type of your settings if known
+    ):
+        self.provider = provider
+        self.settings = settings
 
-    def register_agent(self, agent_id, agent):
-        self.agents[agent_id] = agent
+    def resolve(
+        self,
+        repository_context: RepositoryContext,
+        plugins: list[Any] | tuple[Any, ...] | None = None,
+    ) -> list[SpecialistAgent]:
+        agents: list[SpecialistAgent] = []
 
-    def get_agent(self, agent_id):
-        return self.agents.get(agent_id)
+        for name, config in self.settings.agents.items():
+            if not config.enabled:
+                continue
+            if not config.agent_id:
+                continue
+            if not self._supports_stack(config, repository_context):
+                continue
 
-    def unregister_agent(self, agent_id):
-        if agent_id in self.agents:
-            del self.agents[agent_id]
+            agents.append(
+                SpecialistAgent(
+                    name=name,
+                    agent_id=config.agent_id,
+                    provider=self.provider,
+                    description=config.description,
+                )
+            )
+        return agents
+    
+    def _supports_stack(self, config: Any, repository_context: RepositoryContext) -> bool:
+        supported_frameworks = set(config.supported_frameworks)
+        if not supported_frameworks:
+            return True  # If no specific frameworks are defined, assume support for all
+        
+        detected_frameworks = repository_context.stack.frameworks
+        return bool(supported_frameworks & detected_frameworks)

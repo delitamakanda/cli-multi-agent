@@ -4,6 +4,13 @@ from pathlib import Path
 from orchestrator.discovery.stack_detector import DetectedStack
 
 @dataclass(slots=True)
+class SpecialistAgentSettings:
+    agent_id: str
+    enabled: bool = True
+    description: str = ""
+    frameworks: list[str] = field(default_factory=list)
+
+@dataclass(slots=True)
 class AuditResult:
     stack: DetectedStack
     repository_context: "RepositoryContext"
