@@ -5,11 +5,30 @@ class ProductOwnerAgent:
         self.agent_id = agent_id
 
     def generate_roadmap(self, final_report, repository_context):
+        stack = repository_context.stack
+
+        languages = ", ".join(sorted(stack.languages)) or "Non détectée"
+        frameworks = ", ".join(sorted(stack.frameworks)) or "Non détectée"
+        tools = ", ".join(sorted(stack.tools)) or "Non détectée"
+        reposity_summary = "\n".join(
+            [
+                f" - Nom du dépôt : {repository_context.name}",
+                f" - Languages : {languages}",
+                f" - Frameworks : {frameworks}",
+                f" - Outils : {tools}",
+                f" - Description : {repository_context.description or 'Non détectée'}",
+                f" - Fichiers analysés : {len(repository_context.files)}",
+                f" - Monorepo : {'Oui' if stack.is_monorepo else 'Non'}",
+            ]
+        )
         prompt = f"""
 Tu es un Product Owner. 
 Ton rôle est de créer une feuille de route pour le projet en fonction du rapport final et du contexte du dépôt.
 
 Produis une feuille de route claire et concise, en mettant en évidence les étapes clés, les jalons et les priorités.
+
+## Dépôt
+{reposity_summary}
 
 Découpe en tickets.
 
