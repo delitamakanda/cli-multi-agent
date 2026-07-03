@@ -13,7 +13,7 @@ class AuditService:
             context_builder,
             orchestrator,
             product_owner,
-            report_writers,
+            report_generators,
             max_workers: int = 5,
         ) -> None:
         self.scanner = scanner
@@ -23,7 +23,7 @@ class AuditService:
         self.context_builder = context_builder
         self.orchestrator = orchestrator
         self.product_owner = product_owner
-        self.report_writers = report_writers
+        self.report_generators = report_generators
         self.max_workers = max_workers
 
     def analyze(self, repo_path: Path, generate_roadmap: bool = True) -> AuditResult:
@@ -73,3 +73,31 @@ class AuditService:
                     reports[agent_name] = f"Error: {str(e)}"
 
         return reports
+    
+    def write_reports(
+        self,
+        audit_result: AuditResult,
+        output_dir: Path,
+        formats: list[str] | None = None,
+    ) -> list[Path]:
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        written_files: list[Path] = []
+
+        for format_name in formats:
+            normalized_format = format_name.lower().strip()
+
+            generator = self.report_generators.get(normalized_format)
+
+            if generator is None:
+                available_formats = ", ".join(
+                    sorted(self.report_generators)
+                )
+                raise ValueError(f"Unsupported format: {format_name}. Available formats: {available_formats}")
+            content = generator.generate_report(audit_result)
+            extension = getattr(generator, "extension", normalized_format)
+            output_file = output_dir / f"report.{extension}"
+            output_file.write_text(content, encoding="utf-8")
+            written_files.append(output_file)
+
+        return written_files
