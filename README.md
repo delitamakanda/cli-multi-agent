@@ -88,7 +88,7 @@ repo-audit analyze [REPOSITORY_PATH] [OPTIONS]
 | `--output`, `-o` | `.repo-audit` | Directory where reports are written |
 | `--config`, `-c` | none | Path to a YAML/JSON config file |
 | `--format` | `markdown` | Report format(s) to generate; repeatable (`markdown`, `json`) |
-| `--no-readmap` | off | Skip roadmap generation |
+| `--no-roadmap` | off | Skip roadmap generation |
 
 Reports are written to `<output>/report.<format>`.
 

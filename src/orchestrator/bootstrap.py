@@ -13,6 +13,7 @@ from orchestrator.agents.registry import AgentRegistry
 from orchestrator.agents.orchestrator import OrchestratorAgent
 from orchestrator.agents.product_owner import ProductOwnerAgent
 
+from orchestrator.domain.enums import ReportFormat
 from orchestrator.plugins.registry import PluginRegistry
 
 from orchestrator.providers.mistral import MistralProvider
@@ -50,8 +51,8 @@ def build_application(config_path: Path | None = None) -> AuditService:
         agent_id=settings.product_owner.agent_id,
     )
     report_generators = {
-        "markdown": MarkdownReportGenerator(),
-        "json": JSONReportGenerator(),
+        ReportFormat.MARKDOWN: MarkdownReportGenerator(),
+        ReportFormat.JSON: JSONReportGenerator(),
     }
 
     return AuditService(
