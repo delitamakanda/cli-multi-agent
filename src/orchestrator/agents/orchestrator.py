@@ -74,7 +74,7 @@ class OrchestratorAgent:
 
         return "\n".join([
             f"- Nom du dépôt : {repository_context.name}",
-            f"- Chemin du dépôt : {repository_context.path}",
+            f"- Chemin du dépôt : {repository_context.repository_path}",
             f"- Stack : {stack.name}",
             f"- Langages : {languages}",
             f"- Frameworks : {frameworks}",
