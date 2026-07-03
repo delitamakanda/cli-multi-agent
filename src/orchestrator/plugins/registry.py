@@ -1,9 +1,16 @@
-class PluginRegistry:
-    def __init__(self):
-        self._plugins = {}
-    
-    def register_plugin(self, plugin_name: str, plugin_class):
-        self._plugins[plugin_name] = plugin_class
+from orchestrator.domain.models import RepositoryContext
 
-    def get_plugin(self, plugin_name: str):
-        return self._plugins.get(plugin_name)
+
+class PluginRegistry:
+    def __init__(
+        self,
+        repository_context: RepositoryContext | None = None,
+    ) -> None:
+        self._repository_context = repository_context
+
+    def resolve(self, repository_context: RepositoryContext) -> list:
+        """
+        Resolve the plugins for the given repository context.
+        """
+        self._repository_context = repository_context
+        return []
