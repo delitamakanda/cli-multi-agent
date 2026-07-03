@@ -1,244 +1,161 @@
-# Report d'audit - orion-platform
+# Report d'audit - angular-ssr-taiwan
 
 
 ## Résumé du dépôt
 
-- **Chemin du dépôt**: C:\Users\delit\AppData\Local\Temp\repo-audit-u_89bcx8\orion-platform
-- **Langages détectés**: JavaScript, Python
-- **Frameworks détectés**: None
-- **Outils détectés**: Ansible
+- **Chemin du dépôt**: C:\Users\delit\AppData\Local\Temp\repo-audit-afa3d3fj\angular-ssr-taiwan
+- **Langages détectés**: JavaScript
+- **Frameworks détectés**: Express.js
+- **Outils détectés**: Docker
 - **Monorepo**: Non
 
 ## Rapport final
 
-# **Rapport Final d'Audit Technique - Orion Platform**
+Voici le **rapport final complet et structuré** pour le dépôt **`angular-ssr-taiwan`**, synthétisé à partir des analyses des agents spécialisés. Les informations sont **concrètes, priorisées et directement actionnables** pour le Product Owner.
+
+---
+
+---
+
+# **📊 Rapport d'Audit Complet – Projet `angular-ssr-taiwan`**
 *Date : 03 juillet 2026*
-*Analyse complète par Agent Chef d'Orchestre (Mistral AI)*
+*Dépôt : `C:\Users\delit\AppData\Local\Temp\repo-audit-afa3fj\angular-ssr-taiwan`*
+*Stack : Angular v21.2.15 + SSR + Express.js 5.1.0 + Tailwind CSS v4.2.2 + Docker (non configuré)*
 
 ---
 
 ---
 
-## **📌 1. Résumé Exécutif**
-Le dépôt **Orion Platform** est une application web destinée aux administrations, magistrats et procureurs pour la **priorisation et l'analyse des plaintes**. Il est structuré en **3 services indépendants** :
-- **`mock-system-api`** : Mock API externe (JSON Server) pour simuler un système de gestion des plaintes.
-- **`orion-api`** : Backend Django (v6.0.6) avec Django REST Framework pour la synchronisation des plaintes et la priorisation IA (via Mistral API ou mock).
-- **`orion-web`** : Frontend Angular 22 avec Angular Material et Tailwind CSS pour l'interface utilisateur.
-
-### **Points Clés**
-✅ **Architecture bien segmentée** avec une séparation claire des responsabilités.
-✅ **Dockerisé** (via `compose.yaml`) pour un déploiement local simplifié.
-✅ **Intégration CI/CD** via GitHub Actions pour Angular et Django.
-✅ **Stack technique moderne** : Django 6.0.6, Angular 22, Tailwind CSS v4.
-
-⚠️ **Risques majeurs identifiés** :
-- **Sécurité** : Secrets exposés (`SECRET_KEY`, `MISTRAL_API_KEY`), `DEBUG=True` par défaut, SQLite en production, données sensibles dans `db.json`.
-- **Qualité** : Absence de tests pour `mock-system-api`, pas de tests E2E, dépendances non verrouillées.
-- **Accessibilité** : Non-conformité WCAG (contraste, navigation clavier, sémantique HTML).
-- **Performance** : Pas de lazy loading, bundle Angular potentiellement trop lourd, pas de cache pour les requêtes API.
-- **DevOps** : Pas de workflow CI/CD global, pas de health checks Docker, pas de monitoring.
-
-🎯 **Priorité absolue** :
-1. **Corriger les failles de sécurité critiques** (secrets, DEBUG, SQLite, HTTPS).
-2. **Ajouter des tests** (unitaire, E2E, intégration).
-3. **Améliorer l'accessibilité** (WCAG AA).
-4. **Optimiser les performances** (lazy loading, cache, bundle size).
-
 ---
 
+## **🎯 1. Résumé Exécutif**
+
+### **Contexte**
+Le projet **`angular-ssr-taiwan`** est une application web **Angular avec SSR (Server-Side Rendering)** conçue pour un blog sur Taïwan (destinations, articles, médias). Il utilise :
+- **Frontend** : Angular v21.2.15 (standalone components, signals, `@angular/ssr`).
+- **Backend** : Express.js v5.1.0 (pour le SSR) + `json-server` v0.17.4 (mock API WordPress).
+- **Styling** : Tailwind CSS v4.2.2 (via PostCSS).
+- **Tests** : Vitest v4.0.8 (unitaires, non configuré pour E2E).
+- **Déploiement** : Docker mentionné dans la stack, mais **aucune configuration Docker présente**.
+
+### **Objectifs du Projet**
+- **SEO optimisé** grâce au SSR.
+- **Contenu riche** (articles, destinations, médias) via une mock API.
+- **Accessibilité** (WCAG AA) et **performances** (SSR, lazy loading).
+- **Maintenabilité** via des guidelines strictes (`.junie/guidelines.md`, `.github/copilot-instructions.md`).
+
+### **État Actuel**
+| **Critère**               | **État**                          | **Commentaires**                                                                                     |
+|---------------------------|-----------------------------------|-----------------------------------------------------------------------------------------------------|
+| **Fonctionnalités**      | ✅ Fonctionnel (dev)             | SSR et mock API opérationnels, mais **pas de tests E2E** et **problèmes de sécurité critiques**.   |
+| **Sécurité**             | ❌ **Critique**                   | `allowedHosts: []`, `json-server` obsolète, données sensibles exposées (`db.json`).               |
+| **Performances**         | ⚠️ **Moyennes**                  | Bundle trop lourd (500kB+), pas de lazy loading vérifié, images externes non optimisées.          |
+| **Accessibilité**        | ⚠️ **Partielle**                  | `lang="en"` avec contenu FR, pas de balises ARIA, pas d’audit automatisé (`axe-core`).             |
+| **Maintenabilité**       | ⚠️ **Moyenne**                   | Code bien structuré, mais **redondances dans les guidelines**, pas de CI/CD.                        |
+| **Déploiement**          | ❌ **Non prêt pour la production**| Pas de Dockerfile, pas de configuration HTTPS/CORS, Express 5.x en beta.                          |
+
+---
 ---
 
 ---
 
 ## **🚨 2. Problèmes Critiques**
-*À corriger **immédiatement** (risque de blocage ou de faille de sécurité majeure).*
+*À corriger **immédiatement** avant toute mise en production.*
 
-| **ID** | **Problème** | **Impact** | **Fichiers Concernés** | **Solution Proposée** |
-|--------|--------------|------------|------------------------|------------------------|
-| **SEC-001** | **`SECRET_KEY` et `MISTRAL_API_KEY` non validés** → Risque de crash ou d'exposition de clés par défaut. | **Critique** (Fuite de données, indisponibilité) | `orion-api/config/settings.py` | Ajouter une validation au démarrage : `if not SECRET_KEY: raise ValueError("SECRET_KEY manquant")`. |
-| **SEC-002** | **`DEBUG=True` par défaut** dans `compose.yaml` → Exposition d'erreurs détaillées en production. | **Critique** (Fuite d'informations sensibles) | `compose.yaml`, `orion-api/config/settings.py` | Forcer `DEBUG=False` en production : `DEBUG = os.getenv("ENVIRONMENT") != "production"`. |
-| **SEC-003** | **SQLite en production** → Non scalable, pas de backup automatique, risque de corruption. | **Critique** (Perte de données, lenteur) | `orion-api/config/settings.py` | Remplacer par PostgreSQL : `ENGINE = 'django.db.backends.postgresql'`. |
-| **SEC-004** | **Données sensibles dans `db.json`** (violences, suicides) → Risque RGPD si exposé. | **Critique** (Violation de la confidentialité) | `mock-system-api/db.json` | Remplacer par des données fictives (ex: avec `faker`). Ajouter `db.json` à `.gitignore`. |
-| **SEC-005** | **Pas de HTTPS imposé** → Risque MITM (Man-in-the-Middle). | **Critique** (Interception des données) | `orion-api/config/settings.py`, `compose.yaml` | Configurer un reverse proxy (Nginx/Traefik) avec Let's Encrypt. |
-| **SEC-006** | **`json-server` version obsolète (0.17.4)** → Vulnérabilités connues (ex: CVE-2021-23337). | **Élevé** (Attaque par injection) | `mock-system-api/package.json` | Mettre à jour vers `json-server@1.0.0` ou utiliser un mock personnalisé. |
-| **SEC-007** | **Ports exposés sur `0.0.0.0` sans restriction** → Accès non autorisé possible. | **Élevé** (Accès non sécurisé) | `compose.yaml` | Restreindre à `127.0.0.1` ou utiliser un réseau Docker interne. |
-| **ACC-001** | **Non-conformité WCAG** (contraste < 4.5:1, navigation clavier inexistante, balises non sémantiques). | **Élevé** (Exclusion des utilisateurs malvoyants) | `orion-web/src/styles.css`, `orion-web/src/index.html` | Appliquer les règles WCAG AA : contraste, `tabindex`, `aria-label`, balises sémantiques (`<nav>`, `<button>`). |
-| **ACC-002** | **Langue incorrecte (`lang="en"`)** alors que le projet est en français. | **Moyen** (Mauvaise interprétation par les outils d'assistance) | `orion-web/src/index.html` | Corriger en `lang="fr"`. |
+| **ID** | **Problème**                                                                 | **Impact**                          | **Fichiers Concernés**               | **Solution Proposée**                                                                                     |
+|--------|-----------------------------------------------------------------------------|-------------------------------------|--------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| **C1** | `allowedHosts: []` dans `angular.json` → **Toutes les origines sont autorisées**. | ❌ **Risque de CSRF/Host Header Injection** | `angular.json` | Configurer `allowedHosts: ["localhost", "angular-ssr-taiwan.com"]`.                                      |
+| **C2** | `json-server@0.17.4` (obsolète, non maintenu depuis 2023).                  | ❌ **Vulnérabilités de sécurité**    | `mock-wp-api/package.json`          | Remplacer par [`msw`](https://mswjs.io/) ou [`mockoon`](https://mockoon.com/).                             |
+| **C3** | `db.json` expose des **emails réels** (ex: `delita.makanda@gmail.com`).      | ❌ **Risque de spam/phishing**       | `mock-wp-api/db.json`                | Anonymiser les données (`user@example.com`) ou supprimer les emails.                                   |
+| **C4** | **Express.js 5.1.0** (version beta, instable).                              | ❌ **Risque de crash en production**  | `package.json`                       | Revenir à **Express 4.18.2** (LTS).                                                                       |
+| **C5** | **Pas de CSP (Content Security Policy)** configuré.                       | ❌ **Risque de XSS**                  | `src/index.html`                    | Ajouter `<meta http-equiv="Content-Security-Policy" content="default-src 'self'">`.                       |
+| **C6** | **`lang="en"` dans `index.html`** mais contenu en français.                | ❌ **Mauvaise localisation**         | `src/index.html`                    | Changer en `lang="fr"` ou implémenter l’**i18n**.                                                          |
 
+---
 ---
 
 ---
 
-## **⚠️ 3. Problèmes Majeurs**
-*À corriger **sous 1-2 sprints** (impact significatif sur la qualité, la maintenabilité ou l'UX).*
+## **🔴 3. Problèmes Majeurs**
+*À corriger **avant la mise en production**.*
 
-| **ID** | **Problème** | **Impact** | **Fichiers Concernés** | **Solution Proposée** |
-|--------|--------------|------------|------------------------|------------------------|
-| **TEST-001** | **Pas de tests pour `mock-system-api`** → Fiabilité réduite des intégrations. | **Élevé** (Régressions non détectées) | `mock-system-api/package.json` | Ajouter `supertest` + Jest : `npm install --save-dev jest supertest`. |
-| **TEST-002** | **Pas de tests E2E** → Impossible de valider les flux utilisateurs. | **Élevé** (Qualité logicielle) | `orion-web/package.json` | Intégrer Cypress ou Playwright : `npm install --save-dev cypress`. |
-| **TEST-003** | **Pas de couverture de code** → Difficile d'évaluer la qualité des tests. | **Moyen** (Maintenabilité) | `.github/workflows/` | Ajouter `pytest-cov` (Django) et `nyc` (Angular). |
-| **DEP-001** | **Dépendances non verrouillées** (ex: `^22.0.1` pour Angular) → Risque de breaking changes. | **Élevé** (Incompatibilités) | `orion-web/package.json`, `orion-api/requirements.txt` | Utiliser des versions exactes : `=22.0.1`. Ajouter `requirements.txt` pour Django. |
-| **DEP-002** | **`requirements-dev.txt` manquant** → Environnement de dev non reproductible. | **Moyen** (Maintenabilité) | `orion-api/` | Créer `requirements-dev.txt` avec `pytest`, `flake8`, etc. |
-| **PERF-001** | **Pas de lazy loading** pour les modules Angular → Temps de chargement initial long. | **Moyen** (UX dégradée) | `orion-web/src/app/app-routing.module.ts` | Configurer `loadChildren` pour les modules lourds. |
-| **PERF-002** | **Pas de cache pour les requêtes API** → Latence accrue. | **Moyen** (Performance) | `orion-api/config/settings.py` | Ajouter `@cache_page` (Django) ou Redis. |
-| **PERF-003** | **Bundle Angular potentiellement trop lourd** (dépendances comme `xlsx`, `jspdf`). | **Moyen** (Performance) | `orion-web/package.json` | Optimiser avec `ngOptimizedImage` et code splitting. |
-| **DEVOPS-001** |
+| **ID** | **Problème**                                                                 | **Impact**                          | **Fichiers Concernés**               | **Solution Proposée**                                                                                     |
+|--------|-----------------------------------------------------------------------------|-------------------------------------|--------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| **M1** | **Pas de lazy loading** configuré pour les routes.                         | ⚠️ **Bundle trop lourd (500kB+)**  | `angular.json`, `app.routes.ts`      | Configurer `loadChildren` pour les routes secondaires (ex: `/destinations`).                                |
+| **M2** | **Pas de tests E2E** (Cypress/Playwright absent).                          | ⚠️ **Couverture de test à 0%**      | `package.json`, `angular.json`       | Ajouter **Playwright** : `npm install -D @playwright/test` + configurer dans `angular.json`.               |
+| **M3** | **Pas de Dockerfile** pour le déploiement.                                | ⚠️ **Déploiement non reproductible**| (Aucun fichier Docker)               | Créer un `Dockerfile` multi-stage pour Angular + SSR + Express.                                          |
+| **M4** | **Images externes (Unsplash)** non optimisées.                            | ⚠️ **Performances dégradées**      | `db.json`, composants Angular        | Utiliser `NgOptimizedImage` avec `loading="lazy"` et `priority` + héberger les images localement.           |
+| **M5** | **Pas de gestion d’état global** (NgRx, signaux globaux).                  | ⚠️ **Code dupliqué**                 | À implémenter                         | Utiliser **Angular Signals** ou **NgRx** pour l’état partagé (ex: panier, utilisateur).                     |
+| **M6** | **Pas de CI/CD** configuré.                                                | ⚠️ **Déploiements manuels**         | (Aucun fichier `.github/workflows/`) | Configurer **GitHub Actions** pour build + tests + déploiement.                                          |
+| **M7** | **Tailwind CSS en double** dans `package.json` (devDependencies + dependencies). | ⚠️ **Conflits de versions**         | `package.json`                       | Garder `tailwindcss` uniquement dans `devDependencies`.                                                  |
+| **M8** | **Pas de configuration HTTPS** pour le serveur Express.                   | ⚠️ **Risque MITM**                   | `src/server.ts`                      | Utiliser `https` avec [`helmet`](https://github.com/helmetjs/helmet) : `app.use(helmet({ hsts: true }))`.   |
+| **M9** | **Pas de rate limiting** pour l’API mock.                                  | ⚠️ **Risque de DDoS**                | `mock-wp-api/server.js`              | Ajouter [`express-rate-limit`](https://github.com/express-rate-limit/express-rate-limit).                |
+| **M10**| **Pas de `tailwind.config.js`** visible.                                   | ⚠️ **Tailwind ne fonctionnera pas**  | Racine du projet
 
 ## Feuille de route
 
-Voici une **feuille de route technique** structurée en tickets priorisés pour le dépôt **orion-platform**, basée sur le rapport d'audit. Chaque ticket inclut les dépendances, risques, métriques de succès, et parties prenantes.
+Voici une **feuille de route claire et structurée** pour le projet `angular-ssr-taiwan`, basée sur le rapport final. Chaque section répond aux exigences demandées (tickets, priorités, dépendances, risques, métriques, parties prenantes).
 
 ---
 
 ```markdown
-# 🚀 Feuille de Route Technique - Orion Platform
+# 📅 Feuille de Route – Projet `angular-ssr-taiwan`
 *Date : 03 juillet 2026*
-*Product Owner : Synthèse (Mistral AI)*
+*Responsable : Product Owner (Synthèse)*
+*Stack : Angular v21.2.15 + SSR + Express.js 5.1.0 + Tailwind CSS v4.2.2*
 
 ---
 
-## 📅 **Jalons Principaux**
-| Jalon | Date Cible | Objectif | Statut |
-|-------|------------|----------|--------|
-| **J1 : Sécurité Critique** | 10/07/2026 | Résolution des failles SEC-001 à SEC-007 | ⏳ À démarrer |
-| **J2 : Qualité & Tests** | 24/07/2026 | Couverture tests > 80%, correction des dépendances | ⏳ Planifié |
-| **J3 : Accessibilité & Performance** | 07/08/2026 | Conformité WCAG AA, optimisations | ⏳ Planifié |
-| **J4 : DevOps & Monitoring** | 21/08/2026 | CI/CD globale, health checks, monitoring | ⏳ Planifié |
+## 🎯 Objectifs Principaux
+1. **Sécuriser** l’application (corriger les vulnérabilités critiques).
+2. **Optimiser** les performances (lazy loading, images, bundle).
+3. **Industrialiser** le déploiement (Docker, CI/CD).
+4. **Améliorer** la maintenabilité (tests E2E, gestion d’état).
+5. **Garantir** l’accessibilité (WCAG AA) et la localisation.
 
 ---
 
 ---
 
-## 🎯 **Backlog Priorisé**
+## 📋 Backlog Priorisé (Tickets)
+
+### 🔴 **Sprint 0 – Urgent (1-2 semaines)**
+*Correction des problèmes critiques bloquants pour la production.*
+
+| **ID** | **Ticket** | **Description** | **Effort** | **Priorité** | **Dépendances** | **Risques/Obstacles** | **Métriques de Succès** | **Parties Prenantes** |
+|--------|------------|----------------|------------|--------------|-----------------|------------------------|--------------------------|------------------------|
+| **T-C1** | Configurer `allowedHosts` | Ajouter `["localhost", "angular-ssr-taiwan.com"]` dans `angular.json` pour restreindre les origines. | 2h | **P0** (Critique) | Aucune | Mauvaise configuration → exposition aux attaques CSRF. | `allowedHosts` validé par audit de sécurité. | DevOps, Sécurité |
+| **T-C2** | Remplacer `json-server` par MSW | Migrer de `json-server@0.17.4` vers [`msw`](https://mswjs.io/) pour éviter les vulnérabilités. | 8h | **P0** | T-C3 (anonymisation des données) | Incompatibilité avec les endpoints existants. | Tests unitaires passant sur les mocks MSW. | Backend, Frontend |
+| **T-C3** | Anonymiser `db.json` | Remplacer les emails réels (`delita.makanda@gmail.com`) par des placeholders (`user@example.com`). | 1h | **P0** | Aucune | Données sensibles oubliées. | Aucune donnée personnelle dans `db.json`. | Juridique, Sécurité |
+| **T-C4** | Downgrader Express.js | Passer de `5.1.0` (beta) à `4.18.2` (LTS) pour stabilité. | 2h | **P0** | Aucune | Régressions avec SSR. | Tests de non-régression passant. | Backend |
+| **T-C5** | Ajouter CSP | Configurer `<meta http-equiv="Content-Security-Policy">` dans `index.html`. | 2h | **P0** | Aucune | CSP trop restrictif → cassage du frontend. | Audit via [CSP Evaluator](https://csp-evaluator.withgoogle.com/). | Sécurité |
+| **T-C6** | Corriger `lang="en"` | Changer `lang="en"` en `lang="fr"` dans `index.html`. | 30m | **P0** | Aucune | Impact SEO négatif. | Vérification via [Lighthouse](https://developer.chrome.com/docs/lighthouse/overview/). | SEO, Frontend |
 
 ---
 
-### 🔴 **Sprint 1 (04/07 - 10/07) : Sécurité Critique**
-**Objectif** : Corriger les failles bloquantes identifiées dans le rapport.
+### 🟡 **Sprint 1 – Majeurs (2-3 semaines)**
+*Améliorations critiques pour la production.*
 
-#### **Ticket 1.1 : Sécuriser les secrets et clés API (SEC-001, SEC-004)**
-- **Description** :
-  - Valider `SECRET_KEY` et `MISTRAL_API_KEY` au démarrage de Django.
-  - Remplacer les données sensibles dans `mock-system-api/db.json` par des données fictives (via `faker`).
-  - Ajouter `db.json` à `.gitignore`.
-- **Effort** : 2 jours (1 jour backend + 1 jour mock API).
-- **Priorité** : **Critique** (P0).
-- **Dépendances** : Aucune.
-- **Risques** :
-  - Perte de données si `db.json` est supprimé sans backup (mitigation : sauvegarder avant modification).
-  - Impact sur les tests si les données mockées changent (mitigation : documenter le nouveau format).
-- **Métriques de succès** :
-  - Aucune clé API ou donnée sensible commité dans le dépôt.
-  - Validation des secrets réussie en environnement de test.
-- **Parties prenantes** :
-  - **Backend** : Développeur Django (responsable).
-  - **Frontend** : Validation de l'intégration avec le mock API.
-  - **DevOps** : Vérification des variables d'environnement en CI/CD.
+| **ID** | **Ticket** | **Description** | **Effort** | **Priorité** | **Dépendances** | **Risques/Obstacles** | **Métriques de Succès** | **Parties Prenantes** |
+|--------|------------|----------------|------------|--------------|-----------------|------------------------|--------------------------|------------------------|
+| **T-M1** | Activer le lazy loading | Configurer `loadChildren` pour les routes `/destinations` et `/articles` dans `app.routes.ts`. | 4h | **P1** | Aucune | Routes mal configurées → 404. | Bundle principal < 300kB. | Frontend |
+| **T-M2** | Ajouter des tests E2E | Intégrer Playwright : configurer `playwright.config.ts` et écrire 3 tests (homepage, article, 404). | 12h | **P1** | T-M6 (CI/CD) | Tests flakys (non déterministes). | 100% des pages critiques couvertes. | QA, DevOps |
+| **T-M3** | Créer un Dockerfile | Multi-stage build pour Angular + SSR + Express. | 6h | **P1** | T-C4 (Express LTS) | Problèmes de compatibilité des layers. | Image Docker < 500MB, build en <5min. | DevOps |
+| **T-M4** | Optimiser les images | Remplacer les URLs Unsplash par des images locales + utiliser `NgOptimizedImage`. | 8h | **P1** | T-M1 (lazy loading) | Droits d’auteur sur les images. | Score Lighthouse > 90 (Performance). | Design, Frontend |
+| **T-M5** | Implémenter NgRx | Ajouter NgRx pour gérer l’état global (ex: filtres de destinations). | 16h | **P1** | Aucune | Complexité accrue pour les devs juniors. | Réduction de 50% du code dupliqué. | Frontend |
+| **T-M6** | Configurer CI/CD | GitHub Actions : build, tests unitaires/E2E, déploiement sur Docker Hub. | 6h | **P1** | T-M2 (tests E2E), T-M3 (Docker) | Secrets mal gérés (tokens). | Déploiement automatique à chaque merge sur `main`. | DevOps |
+| **T-M7** | Nettoyer `package.json` | Supprimer la duplication de `tailwindcss` (garder en `devDependencies`). | 1h | **P1** | Aucune | Conflits de versions. | `npm audit` sans erreurs. | Backend |
+| **T-M8** | Sécuriser Express | Ajouter `helmet` + HTTPS via `https.createServer()` dans `server.ts`. | 4h | **P1** | T-C4 (Express LTS) | Certificats SSL mal configurés. | Score A sur [SSL Labs](https://www.ssllabs.com/). | Sécurité |
+| **T-M9** | Ajouter rate limiting | Intégrer `express-rate-limit` (100 req/min) dans `mock-wp-api/server.js`. | 2h | **P1** | T-C2 (MSW) | Faux positifs bloquant des utilisateurs légitimes. | 0 incident de DDoS en prod. | Backend |
+| **T-M10** | Créer `tailwind.config.js` | Configurer Tailwind avec `content: ["./src/**/*.{html,ts}"]`. | 2h | **P1** | T-M4 (images) | Styles cassés si purge mal configuré. | 100% des classes Tailwind fonctionnelles. | Design |
 
 ---
 
-#### **Ticket 1.2 : Désactiver DEBUG et forcer HTTPS (SEC-002, SEC-005)**
-- **Description** :
-  - Configurer `DEBUG=False` en production dans `settings.py` (via `os.getenv("ENVIRONMENT")`).
-  - Ajouter un reverse proxy (Nginx) avec Let's Encrypt pour imposer HTTPS.
-  - Restreindre les ports exposés à `127.0.0.1` dans `compose.yaml`.
-- **Effort** : 3 jours (2 jours backend + 1 jour DevOps).
-- **Priorité** : **Critique** (P0).
-- **Dépendances** : Ticket 1.1 (pour éviter les fuites de logs en DEBUG).
-- **Risques** :
-  - Indisponibilité temporaire pendant la configuration HTTPS (mitigation : tester en staging).
-  - Conflits avec les services existants (mitigation : vérifier les ports utilisés).
-- **Métriques de succès** :
-  - `DEBUG=False` vérifié en production.
-  - Score SSL Labs ≥ A (via [ssllabs.com](https://www.ssllabs.com/)).
-- **Parties prenantes** :
-  - **Backend** : Développeur Django.
-  - **DevOps** : Configuration Nginx/Traefik (responsable).
-  - **Sécurité** : Validation des certificats.
+### 🟢 **Sprint 2 – Améliorations (3-4 semaines)**
+*Optimisations non bloquantes mais importantes.*
 
----
----
-#### **Ticket 1.3 : Remplacer SQLite par PostgreSQL (SEC-003)**
-- **Description** :
-  - Migrer la base de données de SQLite à PostgreSQL dans `settings.py`.
-  - Configurer `docker-compose` pour PostgreSQL (image officielle).
-  - Exécuter les migrations Django (`python manage.py migrate`).
-- **Effort** : 3 jours.
-- **Priorité** : **Critique** (P0).
-- **Dépendances** : Ticket 1.2 (pour éviter les fuites via SQLite en DEBUG).
-- **Risques** :
-  - Perte de données pendant la migration (mitigation : backup de `db.sqlite3`).
-  - Incompatibilités de schémas (mitigation : tester en local avant déploiement).
-- **Métriques de succès** :
-  - Base PostgreSQL opérationnelle en production.
-  - Temps de réponse des requêtes < 200ms (moyenne).
-- **Parties prenantes** :
-  - **Backend** : Développeur Django (responsable).
-  - **DevOps** : Configuration du container PostgreSQL.
-
----
----
-#### **Ticket 1.4 : Mettre à jour json-server (SEC-006)**
-- **Description** :
-  - Mettre à jour `json-server` de la version `0.17.4` à `1.0.0` dans `mock-system-api/package.json`.
-  - Tester les endpoints mockés pour vérifier la compatibilité.
-- **Effort** : 1 jour.
-- **Priorité** : **Élevée** (P1).
-- **Dépendances** : Ticket 1.1 (pour éviter les fuites de données).
-- **Risques** :
-  - Breaking changes dans l'API mockée (mitigation : vérifier le [changelog](https://github.com/typicode/json-server/releases)).
-- **Métriques de succès** :
-  - Version `1.0.0` confirmée dans `package.json`.
-  - Tous les endpoints mockés fonctionnels (tests manuels).
-- **Parties prenantes** :
-  - **Frontend** : Vérification de l'intégration avec Angular.
-
----
----
-### 🟡 **Sprint 2 (11/07 - 24/07) : Qualité & Tests**
-**Objectif** : Améliorer la couverture de tests et stabiliser les dépendances.
-
-#### **Ticket 2.1 : Ajouter des tests unitaires pour mock-system-api (TEST-001)**
-- **Description** :
-  - Configurer Jest + Supertest dans `mock-system-api`.
-  - Écrire des tests pour les endpoints CRUD (`/complaints`, `/priorities`).
-  - Intégrer les tests dans le workflow CI (GitHub Actions).
-- **Effort** : 3 jours.
-- **Priorité** : **Élevée** (P1).
-- **Dépendances** : Ticket 1.4 (pour éviter les tests sur une version obsolète).
-- **Risques** :
-  - Temps d'exécution long des tests (mitigation : utiliser `--maxWorkers=2`).
-- **Métriques de succès** :
-  - Couverture de code ≥ 80% pour `mock-system-api`.
-  - Workflow CI vert pour les tests.
-- **Parties prenantes** :
-  - **Backend** : Développeur Node.js (responsable).
-  - **DevOps** : Intégration CI.
-
----
----
-#### **Ticket 2.2 : Ajouter des tests E2E avec Cypress (TEST-002)**
-- **Description** :
-  - Installer Cypress dans `orion-web`.
-  - Écrire des tests pour les flux principaux :
-    - Connexion utilisateur.
-    - Priorisation d'une plainte.
-    - Affichage des statistiques.
-  - Configurer l'exécution en CI (via `cypress/gh-action`).
-- **Effort** : 5 jours.
-- **Priorité** : **Élevée** (P1).
-- **Dépendances** : Ticket 1.1 (pour éviter les fuites de données en test).
-- **Risques** :
-  - Flakiness des tests E2E (mitigation : utiliser `cypress-retry`).
-- **Métriques de succès** :
-  - 3 flux utilisateurs couverts par des tests E2E.
-  - Workflow CI vert.
-- **Parties prenantes** :
-  - **Frontend** : Développeur Angular (responsable).
-  - **QA** : Validation des scénarios de test.
-
----
----
-#### **Ticket 2.3 : Verrouiller les dépendances (DEP-001, DEP-002)**
-- **Description** :
-  - Remplacer les versions flottantes (`^22.0.1`) par des versions exactes (`=22.0.1`)
+| **ID** | **Ticket** | **Description** | **Effort** | **Priorité** | **Dépendances** | **Risques/Obstacles** | **Métriques de Succès** | **Parties Prenantes** |
+|--------|------------|----------------|------------|--------------|-----------------|------------------------|--------------------------|------------------------|
+| **T-A1** | Implémenter i18n | Ajouter `@angular/localize` pour supporter FR/EN/TW. | 12h | **P2** | T-C6 (lang) | Traductions manquantes. | 100% des pages traduites. | SEO, Frontend |
+| **T-A2** | Audit accessibilité | Intégrer `axe-core` et corriger les erreurs (ARIA, contrastes). | 8h | **P2** | Aucune | Résistance de l’équipe design. | Score Lighthouse > 95 (Accessibilité). | Design, QA |
+| **T-A3** | Optimiser le bundle | Utiliser `angular.json` : `optimization: true`, `aot: true`. | 4h | **P
