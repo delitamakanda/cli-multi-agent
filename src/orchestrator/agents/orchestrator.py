@@ -7,7 +7,7 @@ class OrchestratorAgent:
         self.provider = provider
         self.agent_id = agent_id
 
-    def orchestrate(self, context: str) -> str:
+    def synthesize(self, context: str) -> str:
         prompt = f"""
         Tu es un orchestrateur d'agents. Tu as reçu les rapports de plusieurs agents qui ont analysé un dépôt.
 
@@ -28,3 +28,7 @@ class OrchestratorAgent:
         Vérifie que les phrases ne sont pas incomplètes, pas vagues, pas génériques, et qu'elles sont directement liées au dépôt analysé.
 
 """
+        return self.provider.run(
+            agent_id=self.agent_id,
+            prompt=prompt,
+        ).strip()
