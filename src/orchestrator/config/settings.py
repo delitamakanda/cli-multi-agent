@@ -12,6 +12,7 @@ class MistralSettings(BaseModel):
 
 class ExecutionSettings(BaseModel):
     max_retries: int = 3
+    max_workers: int = 5
     initial_backoff: float = 1.0
     token_budget_per_agent: int = 10000
 
