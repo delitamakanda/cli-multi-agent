@@ -35,5 +35,6 @@ class RepositoryContext:
     files: list[SourceFile] = field(default_factory=list)
     manifests: dict[str, str] = field(default_factory=dict)
     git_summary: str = ""
+    source: str = ""
 
     
