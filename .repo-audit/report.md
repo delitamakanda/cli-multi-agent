@@ -1,56 +1,19 @@
-# Report d'audit - orchestrator
+# Report d'audit - angular-qrcode-restaurant
 
 
 ## Résumé du dépôt
 
-- **Source du dépôt**: C:\DEV\PROTO\orchestrator
-- **Langages détectés**: JavaScript, Python
+- **Source du dépôt**: https://github.com/delitamakanda/angular-qrcode-restaurant.git
+- **Langages détectés**: JavaScript
 - **Frameworks détectés**: None
 - **Outils détectés**: Ansible
 - **Monorepo**: Non
 
 ## Rapport final
 
-Voici le **rapport final structuré et synthétisé** pour le dépôt **`orchestrator`**, avec une priorisation claire, des solutions concrètes, et une validation de la cohérence entre les rapports des agents.
-Toutes les recommandations sont **spécifiques au dépôt**, sans phrases génériques ou vagues.
-
----
-
----
-
-```markdown
-# 📋 **Rapport Final d'Audit – Projet `orchestrator`**
+# **Rapport Final d'Analyse - Projet `angular-qrcode-restaurant`**
 *Date : 06 juillet 2026*
-*Type : CLI Multi-Agent pour Audits de Dépôts Git*
-*Stack : Python 3.14+, Typer, Pydantic, Mistral AI, Ansible*
-*Source : `C:\DEV\PROTO\orchestrator` (42 fichiers analysés)*
-
----
-
----
-
-## 🎯 **Résumé Exécutif**
-Le projet **`orchestrator`** est une **CLI modulaire** permettant d’auditer des dépôts Git via des **agents spécialisés** (architecture, sécurité, performance, UI/UX, etc.).
-**Points clés** :
-✅ **Architecture robuste** : Modularité claire (agents isolés), stack moderne (Python 3.14, Typer, Pydantic).
-✅ **Bonnes pratiques DevOps** : CI/CD basique (GitHub Actions), linting (`ruff`), typage strict (`mypy`).
-✅ **Sécurité** : Validation stricte des configurations, gestion des secrets via `.env`.
-
-⚠️ **Risques majeurs** :
-- **Blocage critique** : Dépendance à **Python 3.14** (non stable en juillet 2026).
-- **Sécurité** : Fuites potentielles de `MISTRAL_API_KEY` (pas de scan de secrets en CI).
-- **Maintenabilité** : **18 variables d’environnement requises** (complexité inutile).
-- **Accessibilité** : CLI non conforme aux **WCAG/RGAA** (sorties `rich` non accessibles).
-- **Documentation** : **Aucun README.md** ou guide utilisateur fourni.
-
-📊 **Score global** :
-| Catégorie          | Score (0-10) | Commentaire                          |
-|--------------------|--------------|--------------------------------------|
-| **Architecture**   | 8/10         | Modulaire mais couplage CLI/core.   |
-| **Sécurité**       | 5/10         | Secrets non sécurisés en CI.        |
-| **Performance**    | 7/10         | Pas de cache/monitoring.             |
-| **Accessibilité**  | 3/10         | Non conforme WCAG/RGAA.              |
-| **Documentation**  | 4/10         | Manque README, exemples, FAQ.        |
+*Analyse multi-agents (Accessibilité, Architecture, DevOps, Documentation, Mentor, Performance, Qualité, Sécurité, UI/UX)*
 
 ---
 
@@ -58,185 +21,177 @@ Le projet **`orchestrator`** est une **CLI modulaire** permettant d’auditer de
 
 ---
 
-## 🚨 **Problèmes Critiques** *(À résoudre en priorité absolue)*
+## **📌 1. Résumé Exécutif**
 
-| **ID**  | **Problème** | **Impact** | **Fichiers Concernés** | **Solution Proposée** | **Effort** | **Responsable** |
-|---------|--------------|------------|------------------------|------------------------|------------|-----------------|
-| **CRIT-001** | **Python 3.14 requis** (`requires-python = ">=3.14"`) → **Le projet ne peut pas être exécuté** (3.14 n’est pas stable en juillet 2026). | ❌ **Blocage total** | `pyproject.toml` | Rétrograder vers **Python 3.12 LTS** (`requires-python = ">=3.12,<3.14"`). | 1h | DevOps |
-| **CRIT-002** | **Fuites de `MISTRAL_API_KEY`** : Aucune détection de commits accidentels de `.env` ou de secrets en dur dans le code. | ❌ **Risque de fuite de données** | `.env`, `settings.py` | 1. Ajouter `.env` à `.gitignore`.<br>2. Intégrer [`detect-secrets`](https://github.com/Yelp/detect-secrets) en **pre-commit** et en CI. | 2h | Sécurité |
-| **CRIT-003** | **Pas de scan de sécurité en CI** : Le workflow GitHub Actions (`python-app.yml`) n’inclut **ni `bandit` ni `safety`**. | ❌ **Vulnérabilités non détectées** | `.github/workflows/python-app.yml` | Ajouter les étapes :<br>```yaml<br>  - name: Scan de sécurité<br>    run: |\n      pip install safety bandit\n      safety check\n      bandit -r src/<br>``` | 1h | DevOps |
+### **Contexte**
+Le projet **`angular-qrcode-restaurant`** est une application web conçue pour permettre aux clients de commander en scannant un QR code en restaurant. Développée avec **Angular 21.2.13**, **Taiga UI (v5.7.0)**, **Tailwind CSS (v4.1.12)**, et un **mock API** basé sur `json-server` et **Cloudflare Pages Functions**, l'application suit des bonnes pratiques modernes (standalone components, signals, Reactive Forms).
 
+**Objectif principal** : Offrir une expérience fluide pour la commande en ligne (dine-in, takeaway, livraison) avec une interface accessible et performante.
+
+---
+
+### **Points Forts Clés**
+✅ **Architecture moderne** :
+- Utilisation d’**Angular 21** avec **standalone components** et **signals** (aligné sur les dernières bonnes pratiques).
+- **Taiga UI** pour une interface cohérente et accessible (conforme WCAG par défaut).
+- **Mock API** fonctionnelle avec `json-server` et Cloudflare Functions pour un développement/local et un déploiement unifié.
+- **CI/CD** basique configurée via GitHub Actions (lint, test, build).
+- **Accessibilité** : Intégration d’**ESLint avec `@angular-eslint/template-accessibility`** et mention explicite des **WCAG AA** dans les guidelines.
+
+✅ **Expérience utilisateur** :
+- Flux utilisateur clair : `Accueil → Mode de commande → Menu → Panier → Checkout → Confirmation`.
+- Prise en charge des **3 modes de commande** (dine-in, takeaway, livraison).
+- **Reactive Forms** pour une gestion robuste des formulaires.
+
+✅ **DevOps** :
+- Pipeline GitHub Actions pour le **linting**, les **tests unitaires (Vitest)**, et le **build**.
+- **Husky** pour les hooks Git (formatage automatique via Prettier).
+- **Proxy Angular** (`proxy.conf.json`) pour rediriger `/api/*` vers le mock API local.
+
+---
+
+### **Points Faibles Critiques**
+⚠️ **Sécurité** :
+- **Absence d’authentification** sur l’API mock (endpoints comme `POST /api/orders` accessibles sans restriction).
+- **Pas de validation/sanitization** des payloads (risque d’injection ou de données corrompues).
+- **`json-server` en version bêta (1.0.0-beta.15)** → instabilité potentielle.
+- **Dépendance vulnérable** : `jsdom@28.0.0` (nécessite une mise à jour vers ≥28.1.0).
+
+⚠️ **Accessibilité** :
+- **Contraste des couleurs** non vérifié (ex: thème Taiga UI par défaut avec `#dc2626`).
+- **Pas de tests automatiques d’accessibilité** (ex: `axe-core`).
+- **Attributs ARIA** et **focus management** non explicitement implémentés.
+
+⚠️ **Performance** :
+- **Pas de lazy loading** pour les routes (risque de bundle trop lourd >500 Ko).
+- **Service Worker** présent mais **non activé** (perte des avantages PWA).
+- **Images non optimisées** (utilisation de placeholders génériques `/images/placeholder-food.jpg`).
+
+⚠️ **Qualité de Code** :
+- **Pas de tests E2E** (Cypress/Playwright) → régressions non détectées.
+- **Pas de typage strict** pour les réponses API (risque d’erreurs à l’exécution).
+- **Memory leaks RxJS** possibles (subscriptions non désabonnées).
+
+⚠️ **Documentation** :
+- **Manque de détails sur l’architecture frontend** (ex: rôle des services comme `CartService`).
+- **API non versionnée** (pas de `/v1/` dans les endpoints).
+- **Pas de schémas OpenAPI** pour documenter les payloads attendus.
+
+⚠️ **UI/UX** :
+- **Expérience mobile non testée** (risque de boutons trop petits ou d’espacement insuffisant).
+- **Gestion des erreurs** absente (ex: produit en rupture de stock, coupon invalide).
+- **Feedback utilisateur** limité (pas de notifications pour l’ajout au panier ou la validation de commande).
+
+---
+
+### **Synthèse des Risques**
+| **Catégorie**          | **Risques Critiques**                                                                 | **Impact** |
+|------------------------|--------------------------------------------------------------------------------------|------------|
+| **Sécurité**           | Authentification manquante, validation des payloads absente, dépendances vulnérables | Élevé      |
+| **Accessibilité**      | Non-conformité WCAG (contraste, ARIA), pas de tests automatiques                     | Élevé      |
+| **Performance**        | Bundle trop lourd, pas de lazy loading, Service Worker non activé                  | Moyen      |
+| **Qualité de Code**    | Pas de tests E2E, typage API faible, memory leaks RxJS                               | Moyen      |
+| **Documentation**      | Architecture non documentée, API non versionnée, pas de schémas OpenAPI             | Faible     |
+| **UI/UX**              | Expérience mobile non optimisée, gestion des erreurs absente                        | Moyen      |
+
+---
 ---
 
 ---
 
-## ⚠️ **Problèmes Majeurs** *(À résoudre sous 1 semaine)*
+## **🚨 2. Problèmes Critiques**
+*À résoudre en priorité absolue (impact direct sur la sécurité, la conformité ou la stabilité).*
 
-| **ID**  | **Problème** | **Impact** | **Fichiers Concernés** | **Solution Proposée** | **Effort** | **Responsable** |
-|---------|--------------|------------|------------------------|------------------------|------------|-----------------|
-| **MAJ-001** | **18 variables d’environnement requises** (ex: `ORCHESTRATOR_AGENT_ID`, `UI_UX_AGENT_ID`) → **Configuration trop complexe**. | ⚠️ **Frustration utilisateur** | `settings.py` | 1. Regrouper les agents par catégorie (ex: `AGENTS_SECURITY_ID`).<br>2. Fournir un `config.example.yaml` avec des valeurs par défaut. | 4h | Dev Backend |
-| **MAJ-002** | **Dépendance `mistralai` non versionnée** → Risque de **breaking changes**. | ⚠️ **Instabilité** | `pyproject.toml` | Pinner la version : `mistralai = ">=1.0.0,<2.0.0"`. | 10 min | DevOps |
-| **MAJ-003** | **Aucun README.md** → **Impossible d’utiliser le projet** sans deviner la configuration. | ⚠️ **Courbe d’apprentissage raide** | `README.md` (manquant) | Créer un README avec :<br>- Installation (`uv sync` ou `pip install -e .`).<br>- Exemple de commande (`repo-audit analyze <url>`).<br>- Lien vers `config.example.yaml`. | 3h | Product Owner |
-| **MAJ-004** | **CLI non accessible** : Utilisation de `rich` sans alternative pour les lecteurs d’écran. | ⚠️ **Exclusion des malvoyants** | `cli.py` | 1. Ajouter une option `--no-color`.<br>2. Fournir des descriptions textuelles pour les emojis/icônes. | 2h | Dev Frontend |
-| **MAJ-005** | **Tests insuffisants** : Un seul test (`test_cli_help`) → **Couverture ~5%**. | ⚠️ **Fiabilité faible** | `tests/` | Ajouter des tests pour :<br>- `load_settings()` (fichiers YAML/JSON invalides).<br>- Validation des `agent_id`.<br>- Gestion des erreurs (ex: fichier de config manquant). | 6h | QA Engineer |
+| **ID**  | **Problème**                                                                                     | **Fichiers Concernés**                          | **Impact** | **Solution Proposée**                                                                                     |
+|---------|-------------------------------------------------------------------------------------------------|-----------------------------------------------|------------|--------------------------------------------------------------------------------------------------------|
+| **SEC-001** | **Absence d’authentification** sur les endpoints sensibles (ex: `POST /api/orders`).          | `functions/api/[[path]].ts`                   | Élevé      | Ajouter une **API key** ou un mécanisme **JWT** pour sécuriser les requêtes.                          |
+| **SEC-002** | **Validation des payloads absente** dans `createOrder` (risque d’injection ou de données invalides). | `functions/api/[[path]].ts`                   | Élevé      | Utiliser **Zod** ou **Joi** pour valider les payloads (ex: `phone: string().regex(/^\+?[0-9\s-]+$/`)). |
+| **SEC-003** | **Dépendance vulnérable** : `jsdom@28.0.0` (CVE connue dans les versions < 28.1.0).                 | `package.json`                                | Élevé      | Mettre à jour vers `jsdom@^28.1.0` (`npm update jsdom@^28.1.0`).                                        |
+| **ACC-001** | **Contraste des couleurs non conforme WCAG AA** (ex: `#dc2626` sur fond blanc).                  | `src/styles.css`, thème Taiga UI              | Élevé      | Vérifier avec [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) et ajuster. |
+| **ACC-002** | **Pas d’attributs ARIA** pour les composants interactifs (ex: modales, menus).                     | Tous les composants Angular                  | Élevé      | Ajouter `aria-label`, `aria-live`, `role`, et gérer le **focus trap** pour les modales.               |
+| **PERF-001** | **Pas de lazy loading** pour les routes (risque de bundle >500 Ko).                              | `src/app/app.routes.ts`, `angular.json`       | Moyen      | Configurer le lazy loading pour les modules `menu`, `cart`, `checkout`.                              |
 
 ---
 ---
 
-## 🟡 **Problèmes Mineurs** *(À résoudre sous 1 mois)*
+---
 
-| **ID**  | **Problème** | **Impact** | **Fichiers Concernés** | **Solution Proposée** | **Effort** |
-|---------|--------------|------------|------------------------|------------------------|------------|
-| **MIN-001** | **Pas de cache pour les configurations** → Relecture des fichiers YAML/JSON à chaque appel. | ⚠️ **Performances dégradées** | `settings.py` | Utiliser `@functools.lru_cache` sur `load_settings()`. | 1h |
-| **MIN-002** | **Ansible listé dans la stack mais non utilisé**. | ⚠️ **Incohérence** | `pyproject.toml` | Supprimer Ansible des dépendances ou documenter son usage. | 30 min |
-| **MIN-003** | **Pas de monitoring** : Aucune métrique de performance (temps d’exécution, erreurs). | ⚠️ **Difficulté à déboguer** | `cli.py` | Intégrer `prometheus-client` pour exposer des métriques. | 3h |
-| **MIN-004** | **Messages d’erreur techniques** (ex: `FileNotFoundError` brut) → **Incompréhensibles pour l’utilisateur**. | ⚠️ **Mauvaise UX** | `settings.py` | Ajouter des messages clairs avec suggestions (ex: "Fichier `config.yaml` introuvable. Vérifiez le
+## **⚠️ 3. Problèmes Majeurs**
+*À résoudre rapidement (impact sur l’expérience utilisateur, la maintenabilité ou la performance).*
+
+| **ID**   | **Problème**                                                                                     | **Fichiers Concernés**                          | **Impact** | **Solution Proposée**                                                                                     |
+|----------|-------------------------------------------------------------------------------------------------|-----------------------------------------------|------------|--------------------------------------------------------------------------------------------------------|
+| **SEC-004** | **`json-server` en version bêta (1.0.0-beta.15)** → instabilité en production.                   | `mock-api/package.json`                       | Moyen      | Migrer vers une version stable (`json-server@^0.17.3`) ou utiliser **MSW (Mock Service Worker)**.   |
+| **SEC-005** | **Pas de CORS configuré** pour l
 
 ## Feuille de route
 
-Voici la **feuille de route produit** pour le dépôt `orchestrator`, structurée en tickets priorisés, avec dépendances, risques, métriques et parties prenantes. Le document est concis, spécifique au dépôt, et conforme à vos exigences (pas de phrases génériques/vagues/incomplètes).
+Voici une **feuille de route structurée et détaillée** pour le projet `angular-qrcode-restaurant`, basée sur le rapport final. Elle inclut les **tickets priorisés**, leurs **dépendances**, **métriques de succès**, **parties prenantes**, **risques** et **efforts estimés**.
 
 ---
 
 ```markdown
-# 📅 **Feuille de Route Produit – `orchestrator`**
-*Dernière mise à jour : 06 juillet 2026*
-*Objectif : Résoudre les blocages critiques, améliorer la sécurité et la maintenabilité, et rendre le projet utilisable en production.*
+# 📋 Feuille de Route – Projet `angular-qrcode-restaurant`
+*Date : 06 juillet 2026*
+*Product Owner : Synthèse*
 
 ---
 
-## 🎯 **Priorités & Jalons**
-| **Jalon**               | **Date Cible**  | **Objectif**                                                                 | **Tickets Associés**                     |
-|-------------------------|-----------------|------------------------------------------------------------------------------|------------------------------------------|
-| **Jalon 0 : Urgence**   | 07 juillet 2026 | Résoudre les blocages critiques (exécutabilité, sécurité).                 | CRIT-001, CRIT-002, CRIT-003             |
-| **Jalon 1 : Stabilité** | 13 juillet 2026 | Corriger les problèmes majeurs (configuration, documentation, accessibilité). | MAJ-001, MAJ-002, MAJ-003, MAJ-004, MAJ-005 |
-| **Jalon 2 : Amélioration** | 06 août 2026   | Optimiser les performances et la maintenabilité.                          | MIN-001, MIN-002, MIN-003, MIN-004       |
-
----
-
----
-
-## 📋 **Backlog des Tickets**
-
-### 🔴 **Critiques (Priorité 0 – À faire immédiatement)**
-#### **CRIT-001 : Rétrograder Python 3.14 vers 3.12 LTS**
-- **Description** : Le projet nécessite Python 3.14 (non stable en juillet 2026), ce qui bloque toute exécution.
-- **Fichiers concernés** : `pyproject.toml` (ligne `requires-python`).
-- **Solution** :
-  - Modifier `requires-python = ">=3.14"` en `requires-python = ">=3.12,<3.14"`.
-  - Tester l’exécutabilité avec Python 3.12.
-- **Effort** : 1h.
-- **Dépendances** : Aucune.
-- **Risques** :
-  - Incompatibilité mineure avec des fonctionnalités Python 3.14 (à vérifier).
-- **Métriques de succès** :
-  - Le projet s’installe et s’exécute avec `python --version >= 3.12`.
-- **Parties prenantes** :
-  - **Responsable** : DevOps (exécution).
-  - **Validateur** : Product Owner (validation de l’exécutabilité).
-
----
-
-#### **CRIT-002 : Sécuriser les secrets (`MISTRAL_API_KEY`)**
-- **Description** : Risque de fuite de `MISTRAL_API_KEY` via des commits accidentels de `.env` ou du code.
-- **Fichiers concernés** : `.env`, `settings.py`, `.gitignore`.
-- **Solution** :
-  1. Ajouter `.env` et `*.env` à `.gitignore`.
-  2. Intégrer [`detect-secrets`](https://github.com/Yelp/detect-secrets) en **pre-commit** (fichier `.pre-commit-config.yaml`).
-  3. Ajouter un scan en CI (GitHub Actions) avec `detect-secrets scan`.
-- **Effort** : 2h.
-- **Dépendances** : CRIT-003 (scan CI).
-- **Risques** :
-  - Faux positifs avec `detect-secrets` (à configurer via `.secrets.baseline`).
-- **Métriques de succès** :
-  - Aucun secret détecté dans le dépôt après scan.
-  - Workflow CI bloque les commits avec des secrets.
-- **Parties prenantes** :
-  - **Responsable** : Équipe Sécurité (implémentation).
-  - **Validateur** : DevOps (intégration CI).
-
----
-#### **CRIT-003 : Ajouter un scan de sécurité en CI**
-- **Description** : Le workflow GitHub Actions (`python-app.yml`) ne scanne pas les vulnérabilités (ex: `bandit`, `safety`).
-- **Fichiers concernés** : `.github/workflows/python-app.yml`.
-- **Solution** :
-  Ajouter les étapes suivantes au workflow :
-  ```yaml
-  - name: Install security tools
-    run: pip install safety bandit detect-secrets
-  - name: Run safety check
-    run: safety check --full-report
-  - name: Run bandit
-    run: bandit -r src/ -f json -o bandit-report.json
-  - name: Run detect-secrets
-    run: detect-secrets scan --baseline .secrets.baseline
-  ```
-- **Effort** : 1h.
-- **Dépendances** : CRIT-002 (configuration de `detect-secrets`).
-- **Risques** :
-  - Temps d’exécution du workflow augmenté (~2 min).
-- **Métriques de succès** :
-  - Workflow CI génère des rapports pour `bandit` et `safety`.
-  - Aucune vulnérabilité critique non résolue.
-- **Parties prenantes** :
-  - **Responsable** : DevOps.
-  - **Validateur** : Équipe Sécurité.
+## 🎯 **Objectifs Principaux**
+1. **Sécuriser l’application** (authentification, validation des payloads, mise à jour des dépendances).
+2. **Améliorer l’accessibilité** (conformité WCAG AA, tests automatiques).
+3. **Optimiser les performances** (lazy loading, Service Worker, images).
+4. **Renforcer la qualité du code** (tests E2E, typage strict, gestion des erreurs).
+5. **Documenter l’architecture** (schémas OpenAPI, versionnage de l’API).
 
 ---
 
 ---
 
-### 🟠 **Majeurs (Priorité 1 – À faire sous 1 semaine)**
-#### **MAJ-001 : Simplifier la configuration (18 variables d’environnement)**
-- **Description** : 18 variables d’environnement sont requises pour configurer les agents, ce qui complexifie l’utilisation.
-- **Fichiers concernés** : `settings.py`, `config.example.yaml` (à créer).
-- **Solution** :
-  1. Regrouper les variables par catégorie (ex: `AGENTS_SECURITY_ID`, `AGENTS_PERFORMANCE_ID`).
-  2. Créer un fichier `config.example.yaml` avec des valeurs par défaut et des commentaires explicatifs.
-  3. Permettre le chargement depuis un fichier YAML/JSON en plus des variables d’environnement.
-- **Effort** : 4h.
-- **Dépendances** : MAJ-003 (documentation).
-- **Risques** :
-  - Rétrocompatibilité à assurer pour les utilisateurs existants (si applicable).
-- **Métriques de succès** :
-  - Nombre de variables d’environnement réduites à ≤ 5.
-  - Fichier `config.example.yaml` validé par l’équipe.
-- **Parties prenantes** :
-  - **Responsable** : Dev Backend.
-  - **Validateur** : Product Owner (ergonomie).
+## 📌 **Backlog Priorisé**
+*(Priorité : 🔴 Critique > 🟡 Majeur > 🟢 Mineur)*
 
 ---
-#### **MAJ-002 : Versionner la dépendance `mistralai`**
-- **Description** : La dépendance `mistralai` n’est pas versionnée dans `pyproject.toml`, ce qui expose le projet à des *breaking changes*.
-- **Fichiers concernés** : `pyproject.toml`.
-- **Solution** :
-  Remplacer `mistralai` par `mistralai = ">=1.0.0,<2.0.0"`.
-- **Effort** : 10 min.
-- **Dépendances** : Aucune.
-- **Risques** :
-  - Aucune si la version 1.x est stable.
-- **Métriques de succès** :
-  - `pip list` affiche une version stable de `mistralai`.
-- **Parties prenantes** :
-  - **Responsable** : DevOps.
+
+### **🔴 priorité critique (à résoudre en premier)**
+#### **1. Sécurité**
+| **ID**   | **Ticket** | **Description** | **Effort** | **Dépendances** | **Métriques de Succès** | **Parties Prenantes** | **Risques/Obstacles** |
+|----------|------------|----------------|------------|------------------|--------------------------|-----------------------|------------------------|
+| **SEC-001** | Implémenter l’authentification sur l’API | Ajouter une **API key** ou **JWT** pour sécuriser les endpoints (`POST /api/orders`, `GET /api/menu`). | 5 jours | Aucun | - 100% des endpoints sensibles protégés. <br> - Tests de pénétration réussis (ex: OWASP ZAP). | Dev Backend, DevOps | - Complexité de l’intégration avec Cloudflare Functions. <br> - Gestion des clés en environnement de production. |
+| **SEC-002** | Valider les payloads API | Utiliser **Zod** pour valider les entrées (ex: `phone: string().regex(/^\+?[0-9\s-]+$/`)). | 3 jours | SEC-001 | - 0 erreur de validation en production. <br> - Schéma de validation documenté. | Dev Backend | - Migration des payloads existants. <br> - Performance impactée par la validation. |
+| **SEC-003** | Mettre à jour `jsdom` | Passer de `jsdom@28.0.0` à `jsdom@^28.1.0` pour corriger les vulnérabilités. | 1 jour | Aucun | - Aucune dépendance vulnérable dans `npm audit`. | Dev Frontend | - Compatibilité avec les tests existants (Vitest). |
+
+#### **2. Accessibilité**
+| **ID**   | **Ticket** | **Description** | **Effort** | **Dépendances** | **Métriques de Succès** | **Parties Prenantes** | **Risques/Obstacles** |
+|----------|------------|----------------|------------|------------------|--------------------------|-----------------------|------------------------|
+| **ACC-001** | Corriger le contraste des couleurs | Vérifier et ajuster les couleurs du thème Taiga UI pour respecter **WCAG AA** (ex: `#dc2626` → `#d32f2f`). | 2 jours | Aucun | - Score de contraste ≥ 4.5:1 pour tous les éléments. <br> - Validation via [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/). | Designers, Dev Frontend | - Résistance au changement de la part des designers. |
+| **ACC-002** | Ajouter les attributs ARIA | Implémenter `aria-label`, `aria-live`, `role`, et gérer le **focus trap** pour les modales. | 3 jours | Aucun | - 100% des composants interactifs accessibles. <br> - Tests manuels avec lecteurs d’écran (NVDA, VoiceOver). | Dev Frontend | - Complexité de l’intégration avec Taiga UI. |
 
 ---
-#### **MAJ-003 : Créer un `README.md` complet**
-- **Description** : Aucune documentation utilisateur n’existe, ce qui rend le projet inutilisable sans connaissance interne.
-- **Fichiers concernés** : `README.md` (à créer).
-- **Solution** :
-  Rédiger un `README.md` avec :
-  - **Installation** : `uv sync` ou `pip install -e .`.
-  - **Configuration** : Lien vers `config.example.yaml` et explications des variables.
-  - **Utilisation** : Exemple de commande (`repo-audit analyze <url>`).
-  - **Contribution** : Lien vers le guide de développement (si existe).
-  - **Licence** : Préciser la licence (ex: MIT).
-- **Effort** : 3h.
-- **Dépendances** : MAJ-001 (simplification de la configuration).
-- **Risques** :
-  - Documentation obsolète si non maintenue.
-- **Métriques de succès** :
-  - Un utilisateur externe peut installer et exécuter le projet avec uniquement le `README.md`.
-- **Parties prenantes** :
-  - **Responsable** : Product Owner.
-  - **Validateur** : Équipe
+
+### **🟡 Priorité Majeur (à résoudre après les critiques)**
+#### **1. Performance**
+| **ID**   | **Ticket** | **Description** | **Effort** | **Dépendances** | **Métriques de Succès** | **Parties Prenantes** | **Risques/Obstacles** |
+|----------|------------|----------------|------------|------------------|--------------------------|-----------------------|------------------------|
+| **PERF-001** | Activer le lazy loading | Configurer le lazy loading pour les modules `menu`, `cart`, `checkout`. | 2 jours | Aucun | - Taille du bundle principal < 300 Ko. <br> - Temps de chargement initial < 2s (testé via Lighthouse). | Dev Frontend | - Refactoring des routes Angular. |
+| **PERF-002** | Activer le Service Worker | Configurer et activer le **Service Worker** pour le cache des assets statiques. | 2 jours | PERF-001 | - Score PWA > 90 dans Lighthouse. <br> - Assets mis en cache et servis hors ligne. | Dev Frontend, DevOps | - Conflits avec Cloudflare Pages. |
+| **PERF-003** | Optimiser les images | Remplacer les placeholders (`/images/placeholder-food.jpg`) par des images **WebP** compressées. | 1 jour | Aucun | - Toutes les images < 100 Ko. <br> - Format WebP utilisé pour 100% des images. | Designers, Dev Frontend | - Temps de génération des images optimisées. |
+
+#### **2. Qualité de Code**
+| **ID**   | **Ticket** | **Description** | **Effort** | **Dépendances** | **Métriques de Succès** | **Parties Prenantes** | **Risques/Obstacles** |
+|----------|------------|----------------|------------|------------------|--------------------------|-----------------------|------------------------|
+| **QUAL-001** | Ajouter des tests E2E | Implémenter des tests avec **Cypress** pour couvrir le flux utilisateur (`Accueil → Panier → Checkout`). | 5 jours | Aucun | - Couverture E2E > 80% des flux principaux. <br> - 0 régression détectée en CI. | Dev Frontend, QA | - Complexité de la configuration de Cypress avec Angular. |
+| **QUAL-002** | Typer strictement les réponses API | Utiliser **TypeScript interfaces** pour typer les payloads (ex: `Order`, `MenuItem`). | 3 jours | SEC-002 | - 0 erreur de typage à l’exécution. <br> - Documentation des interfaces dans le code. | Dev Frontend, Dev Backend | - Migration des appels API existants. |
+| **QUAL-003** | Corriger les memory leaks RxJS | Vérifier et désabonner toutes les **subscriptions** dans les composants/services. | 2 jours | Aucun | - 0 memory leak détecté via Chrome DevTools. | Dev Frontend | - Temps de revues de code pour valider les corrections. |
+
+#### **3. DevOps**
+| **ID**   | **Ticket** | **Description** | **Effort** | **Dépendances** | **Métriques de Succès** | **Parties Prenantes** | **Risques/Obstacles** |
+|----------|------------|----------------|------------|------------------|--------------------------|-----------------------|------------------------|
+| **DEVOPS-001** | Migrer vers `json-server` stable | Remplacer `json-server@1.0.0-beta.15` par `json-server@^0.17.3` ou **MSW**. | 2 jours | SEC-002 | - 0 crash lié à `json-server` en production. | Dev Backend | - Compatibilité avec les endpoints existants. |
+| **DEVOPS-002** | Configurer les CORS | Ajouter les headers CORS pour l’API mock (`Access-Control-Allow-Origin`). | 1 jour | DEVOPS-001 | - 0 erreur CORS en développement/production. | Dev Backend, DevOps | - Conflits avec Cloudflare Functions. |
+
+---
+
+### **🟢 Priorité Mineur (améliorations non bloquantes)**
+#### **1. UI/UX**
+| **ID**   | **Ticket** | **Description** | **Effort** | **Dépendances** | **Métriques de Succès** | **Parties
