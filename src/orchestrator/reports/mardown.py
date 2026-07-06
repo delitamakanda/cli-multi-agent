@@ -16,7 +16,7 @@ class MarkdownReportGenerator:
             "",
             "## Résumé du dépôt",
             "",
-            f"- **Chemin du dépôt**: {context.repository_path}",
+            f"- **Source du dépôt**: {context.source}",
             f"- **Langages détectés**: {languages}",
             f"- **Frameworks détectés**: {frameworks}",
             f"- **Outils détectés**: {tools}",
