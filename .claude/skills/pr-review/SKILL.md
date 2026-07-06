@@ -1,6 +1,8 @@
 ---
 name: pr-review
 description: review pull requests for code quality. Use when reviewing PRs or checking code changes.
+allowed-tools: Read, Grep, Glob, Bash
+model: sonnet
 ---
 
 When reviewing code in this python repository, please follow these guidelines:
