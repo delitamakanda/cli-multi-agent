@@ -46,7 +46,7 @@ class ContextBuilder:
         return (
             "Repository\n\n"
             f"Name: {repository_context.name}\n"
-            f"Path: {repository_context.repository_path}\n"
+            f"Path: {repository_context.source}\n"
         )
     
     @staticmethod
