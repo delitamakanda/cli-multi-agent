@@ -1,16 +1,17 @@
 from orchestrator.domain.models import RepositoryContext
+from orchestrator.plugins.base import StackPlugin
 
 
 class PluginRegistry:
     def __init__(
         self,
-        repository_context: RepositoryContext | None = None,
+        plugins: list[StackPlugin],
     ) -> None:
-        self._repository_context = repository_context
+        self._plugins = plugins
 
-    def resolve(self, repository_context: RepositoryContext) -> list:
-        """
-        Resolve the plugins for the given repository context.
-        """
-        self._repository_context = repository_context
-        return []
+    def matching_plugins(self, repository_context: RepositoryContext) -> list[StackPlugin]:
+        return [
+            plugin
+            for plugin in self._plugins
+            if plugin.supports(repository_context)
+        ]

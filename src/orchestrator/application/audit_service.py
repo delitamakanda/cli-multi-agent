@@ -31,7 +31,7 @@ class AuditService:
 
         repository_context = self.scanner.scan(repository_path, stack)
 
-        plugins = self.plugin_registry.resolve(repository_context)
+        plugins = self.plugin_registry.matching_plugins(repository_context)
 
         agents = self.agent_registry.resolve(repository_context, plugins)
 
