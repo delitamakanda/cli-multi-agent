@@ -48,8 +48,11 @@ Vérifie que le fichier final est un markdown valide.
 Rapport final : 
 {final_report}
 
-Fais bien attention à finir tes phrases et à ne pas laisser de phrases incomplètes. Pas de phrases vagues. Pas de phrases génériques. Pas de phrases qui ne sont pas directement liées au dépôt analysé.    
+Fais bien attention à finir tes phrases et à ne pas laisser de phrases incomplètes. Pas de phrases vagues. Pas de phrases génériques. Pas de phrases qui ne sont pas directement liées au dépôt analysé.
 
+Assure-toi que le fichier final n'as pas de tickets incomplets, pas de tickets vagues, pas de tickets génériques, pas de tickets qui ne sont pas directement liés au dépôt analysé.
+
+Assure-toi  que le fichier final est bien structuré, avec des titres et des sous-titres clairs, et que les informations sont présentées de manière logique et cohérente.
 
 """
         return self.provider.run(
