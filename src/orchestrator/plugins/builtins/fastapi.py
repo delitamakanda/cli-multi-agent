@@ -5,7 +5,7 @@ class FastAPIPlugin(StackPlugin):
     name = "fastapi"
 
     def supports(self, repository_context) -> bool:
-        files = repository_context.files.path
+        files = repository_context.files
         return (
             "main.py" in files
             or "app.py" in files

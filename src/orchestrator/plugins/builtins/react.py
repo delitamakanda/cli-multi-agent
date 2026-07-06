@@ -5,7 +5,7 @@ class ReactPlugin(StackPlugin):
     name = "react"
 
     def supports(self, repository_context) -> bool:
-        files = repository_context.files.path
+        files = repository_context.files
         return (
             "package.json" in files
             and "react" in repository_context.stack.frameworks

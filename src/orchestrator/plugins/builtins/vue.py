@@ -5,7 +5,7 @@ class VuePlugin(StackPlugin):
     name = "vue"
 
     def supports(self, repository_context) -> bool:
-        files = repository_context.files.path
+        files = repository_context.files
         return (
             "package.json" in files
             and "vue" in repository_context.stack.frameworks

@@ -5,7 +5,7 @@ class AngularPlugin(StackPlugin):
     name = "angular"
 
     def supports(self, repository_context) -> bool:
-        files = repository_context.files.path
+        files = repository_context.files
         return (
             "angular.json" in files
             or "angular" in repository_context.stack.frameworks

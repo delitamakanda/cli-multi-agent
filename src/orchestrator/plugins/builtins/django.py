@@ -4,7 +4,7 @@ class DjangoPlugin(StackPlugin):
     name = "django"
 
     def supports(self, repository_context) -> bool:
-        files = repository_context.files.path
+        files = repository_context.files
         return (
             "manage.py" in files
             or "django" in repository_context.stack.frameworks
