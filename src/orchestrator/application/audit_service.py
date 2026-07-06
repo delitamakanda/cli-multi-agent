@@ -26,10 +26,15 @@ class AuditService:
         self.report_generators = report_generators
         self.max_workers = max_workers
 
-    def analyze(self, repository_path: Path, generate_roadmap: bool = True) -> AuditResult:
+    def analyze(
+        self,
+        repository_path: Path,
+        generate_roadmap: bool = True,
+        source: str | None = None,
+    ) -> AuditResult:
         stack = self.stack_detector.detect(repository_path)
 
-        repository_context = self.scanner.scan(repository_path, stack)
+        repository_context = self.scanner.scan(repository_path, stack, source=source)
 
         plugins = self.plugin_registry.matching_plugins(repository_context)
 
