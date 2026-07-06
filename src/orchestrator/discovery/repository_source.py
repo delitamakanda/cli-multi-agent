@@ -41,7 +41,7 @@ class RepositorySourceResolver:
         if not source_value:
             raise RepositorySourceError("Repository source cannot be empty.")
 
-        if not self._is_remote(source_value):
+        if not self.is_remote(source_value):
             path = Path(source_value).expanduser().resolve()
             if not path.exists():
                 raise RepositorySourceError(f"Repository path does not exist: {path}")
@@ -194,7 +194,8 @@ class RepositorySourceResolver:
                 )
 
     @staticmethod
-    def _is_remote(source: str) -> bool:
+    def is_remote(source: str) -> bool:
+        """Return True if `source` is a remote Git URL rather than a local path."""
         parsed = urlparse(source)
         if parsed.scheme in {"http", "https", "ssh", "git", "file"}:
             return True
