@@ -73,7 +73,8 @@ class RepositoryScanner:
     def scan(
             self,
             repository_path: Path,
-            stack: DetectedStack
+            stack: DetectedStack,
+            source: str | None = None,
     ) -> RepositoryContext:
         repository_path = repository_path.resolve()
 
@@ -124,7 +125,8 @@ class RepositoryScanner:
             stack=stack,
             files=files,
             manifests=manifest_files,
-            git_summary=""
+            git_summary="",
+            source=source or str(repository_path),
         )
     
     def _is_ignored(
