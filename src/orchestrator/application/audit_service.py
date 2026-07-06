@@ -1,6 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
+from orchestrator.application.progress import NullProgressReporter, ProgressReporter
 from orchestrator.domain.models import AuditResult
 
 class AuditService:
@@ -31,23 +32,30 @@ class AuditService:
         repository_path: Path,
         generate_roadmap: bool = True,
         source: str | None = None,
+        progress: ProgressReporter | None = None,
     ) -> AuditResult:
+        progress = progress or NullProgressReporter()
+
+        progress.stage("Détection de la stack technique...")
         stack = self.stack_detector.detect(repository_path)
 
+        progress.stage("Analyse des fichiers du dépôt...")
         repository_context = self.scanner.scan(repository_path, stack, source=source)
 
+        progress.stage("Résolution des agents spécialisés...")
         plugins = self.plugin_registry.matching_plugins(repository_context)
 
         agents = self.agent_registry.resolve(repository_context, plugins)
 
+        reports = self._run_agents(agents, repository_context, plugins, progress)
 
-        reports = self._run_agents(agents, repository_context, plugins)
-
+        progress.stage("Synthèse du rapport final...")
         final_report = self.orchestrator.synthesize(repository_context, reports)
 
         roadmap = None
 
         if generate_roadmap:
+            progress.stage("Génération de la feuille de route...")
             roadmap = self.product_owner.generate_roadmap(final_report, repository_context)
 
         return AuditResult(
@@ -56,9 +64,12 @@ class AuditService:
             final_report=final_report,
             roadmap=roadmap,
         )
-    
-    def _run_agents(self, agents, repository_context, plugins):
+
+    def _run_agents(self, agents, repository_context, plugins, progress: ProgressReporter):
         reports: dict[str, str] = {}
+
+        progress.stage(f"Exécution de {len(agents)} agent(s) spécialisé(s)...")
+        progress.agents_planned(len(agents))
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             futures = {}
@@ -74,17 +85,23 @@ class AuditService:
                 try:
                     report = future.result()
                     reports[agent_name] = report
+                    progress.agent_done(agent_name, success=True)
                 except Exception as e:
                     reports[agent_name] = f"Error: {str(e)}"
+                    progress.agent_done(agent_name, success=False)
 
         return reports
-    
+
     def write_reports(
         self,
         audit_result: AuditResult,
         output_dir: Path,
         formats: list[str] | None = None,
+        progress: ProgressReporter | None = None,
     ) -> list[Path]:
+        progress = progress or NullProgressReporter()
+        progress.stage("Écriture des rapports...")
+
         output_dir.mkdir(parents=True, exist_ok=True)
 
         written_files: list[Path] = []
