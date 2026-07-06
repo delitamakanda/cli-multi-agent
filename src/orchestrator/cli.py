@@ -68,9 +68,11 @@ def analyze(
             depth=None if depth == 0 else depth,
             token=token,
         ) as repository_path:
+            source = repository if resolver.is_remote(repository) else None
             result = audit_service.analyze(
                 repository_path=repository_path,
                 generate_roadmap=not no_roadmap,
+                source=source,
             )
 
             paths = audit_service.write_reports(
