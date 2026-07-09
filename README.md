@@ -78,7 +78,7 @@ uv run python -m orchestrator .
 Or use the installed CLI entry point directly:
 
 ```bash
-repo-audit [OPTIONS] [REPOSITORY_PATH]
+repo-audit [REPOSITORY_PATH] [OPTIONS]
 ```
 
 **Options:**
