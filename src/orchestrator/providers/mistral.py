@@ -20,12 +20,7 @@ class MistralProvider(LLMProvider):
                 response = self.client.beta.conversations.start(
                     agent_id=agent_id,
                     agent_version="latest",
-                    inputs=prompt,
-                    model="mistral-medium-latest",
-                    completion_args={
-                        "temperature": 0.1,
-                        "max_tokens": 4096,
-                    }
+                    inputs=prompt
                 )
                 return self._extract_text(response)
             except Exception as e:
